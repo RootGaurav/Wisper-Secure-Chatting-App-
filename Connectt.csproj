@@ -1,0 +1,35 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net8.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Chat_1.png" />
+    <None Remove="Friends.png" />
+    <None Remove="Friend_Request.png" />
+    <None Remove="SignUpBack3.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Resource Include="Chat_1.png" />
+    <Resource Include="Friends.png" />
+    <Resource Include="Friend_Request.png" />
+    <Resource Include="SignUpBack3.jpg" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Session.cs">
+      <Generator>MSBuild:Compile</Generator>
+    </Compile>
+  </ItemGroup>
+
+</Project>

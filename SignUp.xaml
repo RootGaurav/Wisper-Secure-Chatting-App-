@@ -1,0 +1,144 @@
+﻿<Window x:Class="Connectt.SignUp"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="SignUp" Height="400" Width="500"
+        ResizeMode="NoResize"
+        WindowStyle="None"
+        WindowStartupLocation="CenterScreen">
+
+    <Window.Resources>
+
+        <Style x:Key="RoundedTextBox" TargetType="TextBox">
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="#222"/>
+            <Setter Property="BorderBrush" Value="#00C9FF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8"
+                                Padding="6">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
+    <Grid Background="Black">
+        <Image Source="/SignUpBack3.jpg"
+               Stretch="UniformToFill" Panel.ZIndex="0">
+            <Image.OpacityMask>
+                <ImageBrush ImageSource="/SignUpBack3.jpg"/>
+            </Image.OpacityMask>
+        </Image>
+
+        <StackPanel Panel.ZIndex="1"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="#AA000000"
+                    Width="320"
+                    Orientation="Vertical"
+                    Margin="10">
+
+            <TextBlock Text="Name" FontSize="16" FontWeight="Bold" Margin="0,10,0,5">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#FF00C9FF" Offset="0"/>
+                        <GradientStop Color="#FF92FE9D" Offset="1"/>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
+            <TextBox x:Name="Name" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10"/>
+
+            <TextBlock Text="Gmail" FontSize="16" FontWeight="Bold" Margin="0,10,0,5">
+                <TextBlock.Foreground>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                        <GradientStop Color="#FFFF758F" Offset="0"/>
+                        <GradientStop Color="#FFFFC371" Offset="1"/>
+                    </LinearGradientBrush>
+                </TextBlock.Foreground>
+            </TextBlock>
+            <TextBox x:Name="gmail" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10"/>
+
+            <Button Content="Sign Up"
+                    Width="150"
+                    Height="40"
+                    Margin="0,20,0,0"
+                    FontSize="16"
+                    FontWeight="Bold"
+                    Cursor="Hand"
+                    Click="GetInfo">
+                <Button.Style>
+                    <Style TargetType="Button">
+                        <Setter Property="Background">
+                            <Setter.Value>
+                                <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                    <GradientStop Color="#FF00C9FF" Offset="0"/>
+                                    <GradientStop Color="#FF92FE9D" Offset="1"/>
+                                </LinearGradientBrush>
+                            </Setter.Value>
+                        </Setter>
+                        <Setter Property="Foreground" Value="White"/>
+                        <Setter Property="BorderBrush" Value="Transparent"/>
+                        <Setter Property="BorderThickness" Value="0"/>
+                        <Setter Property="Padding" Value="10,5"/>
+                        <Setter Property="Template">
+                            <Setter.Value>
+                                <ControlTemplate TargetType="Button">
+                                    <Border Background="{TemplateBinding Background}"
+                                            BorderBrush="{TemplateBinding BorderBrush}"
+                                            BorderThickness="{TemplateBinding BorderThickness}"
+                                            CornerRadius="20"
+                                            Padding="{TemplateBinding Padding}">
+                                        <ContentPresenter HorizontalAlignment="Center"
+                                                          VerticalAlignment="Center"/>
+                                    </Border>
+                                </ControlTemplate>
+                            </Setter.Value>
+                        </Setter>
+                        <Style.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#00C9FF" BlurRadius="10" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                        </Style.Triggers>
+                    </Style>
+                </Button.Style>
+            </Button>
+
+            <TextBlock x:Name="ErrorTextBlock"
+                       Foreground="Red"
+                       FontSize="14"
+                       FontWeight="Bold"
+                       Visibility="Collapsed"
+                       Margin="0,10,0,0"/>
+            <TextBlock Text="Enter OTP" FontSize="16" FontWeight="Bold" Margin="0,10,0,5"
+           x:Name="OTPLabel" Visibility="Collapsed"/>
+            <TextBox x:Name="OTPBox" Style="{StaticResource RoundedTextBox}" Margin="0,0,0,10"
+         Visibility="Collapsed"/>
+
+            <Button Content="Verify OTP"
+        Width="150"
+        Height="40"
+        Margin="0,10,0,0"
+        FontSize="16"
+        FontWeight="Bold"
+        Cursor="Hand"
+        Click="VerifyOtp_Click"
+        x:Name="VerifyButton"
+        Visibility="Collapsed"/>
+
+        </StackPanel>
+    </Grid>
+</Window>
