@@ -7,130 +7,210 @@
         Title="Extrovet" Height="600" Width="900"
         MinHeight="400" MinWidth="600"
         WindowStartupLocation="CenterScreen"
-        Background="#FFF5F6FA">
+        Background="#0D0F1A">
 
+    <Window.Resources>
+        <SolidColorBrush x:Key="Ink" Color="#E6FFFFFF"/>
+        <SolidColorBrush x:Key="GlassFill" Color="#1AFFFFFF"/>
+        <SolidColorBrush x:Key="GlassStroke" Color="#14FFFFFF"/>
+        <LinearGradientBrush x:Key="NeonGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00C9FF" Offset="0"/>
+            <GradientStop Color="#92FE9D" Offset="1"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="Sidebar" TargetType="Border">
+            <Setter Property="Background" Value="#16202A"/>
+            <Setter Property="CornerRadius" Value="0,12,12,0"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#6600C9FF" BlurRadius="18" ShadowDepth="0" Opacity="0.35"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Sidebar button with image container -->
+        <Style x:Key="SideButton" TargetType="Button">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" CornerRadius="12" Background="Transparent" Padding="8">
+                            <StackPanel HorizontalAlignment="Center">
+                                <!-- Image framed in rounded Border -->
+                                <Border x:Name="imgWrap"
+                        Width="64" Height="64"
+                        CornerRadius="12"
+                        Background="#14FFFFFF">
+                                    <Border.Effect>
+                                        <DropShadowEffect Color="#5500C9FF" BlurRadius="10" ShadowDepth="0" Opacity="0.35"/>
+                                    </Border.Effect>
+                                    <Image Stretch="Uniform"
+                         RenderOptions.BitmapScalingMode="HighQuality"
+                         Source="{TemplateBinding Content}"/>
+                                </Border>
+                                <TextBlock Text="{TemplateBinding Tag}"
+                           Margin="0,6,0,0"
+                           Foreground="{TemplateBinding Foreground}"
+                           FontSize="12"
+                           TextAlignment="Center"/>
+                            </StackPanel>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#1AFFFFFF"/>
+                                <Setter TargetName="imgWrap" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#9900C9FF" BlurRadius="16" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter Property="RenderTransformOrigin" Value="0.5,0.5"/>
+                                <Setter Property="RenderTransform">
+                                    <Setter.Value>
+                                        <ScaleTransform ScaleX="1.05" ScaleY="1.05"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Opacity" Value="0.9"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="HeaderCard" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Background" Value="{StaticResource GlassFill}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassStroke}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#6600C9FF" BlurRadius="18" ShadowDepth="0" Opacity="0.45"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="IconButton" TargetType="Button">
+            <Setter Property="Width" Value="34"/>
+            <Setter Property="Height" Value="34"/>
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" CornerRadius="8" Background="Transparent">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Background" Value="#1FFFFFFF"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#6600C9FF" BlurRadius="12" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
 
     <Grid>
+        <Grid.Background>
+            <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                <GradientStop Color="#0D0F1A" Offset="0"/>
+                <GradientStop Color="#101427" Offset="1"/>
+            </LinearGradientBrush>
+        </Grid.Background>
+
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="80" MinWidth="70"/>
+            <ColumnDefinition Width="90" MinWidth="70"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
+        <Border Grid.Column="0" Style="{StaticResource Sidebar}">
+            <StackPanel VerticalAlignment="Center" Margin="0,24,0,24">
+                <Button Style="{StaticResource SideButton}"
+                Click="FriendRequestButton_Click"
+                Tag="Requests"
+                
+                        
+                 />
 
-        <Border Grid.Column="0" Background="#FF2D3436" CornerRadius="0,10,10,0">
-            <StackPanel VerticalAlignment="Center" Margin="0,20,0,-120">
-
-                <Button Background="Transparent" BorderThickness="0" Foreground="White" FontSize="12" FontWeight="Medium" Click="FriendRequestButton_Click">
-                    <Button.OpacityMask>
-                        <ImageBrush ImageSource="/Friend_Request.png"/>
-                    </Button.OpacityMask>
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="border" CornerRadius="10" Background="Transparent" Padding="10,8">
-                                <StackPanel>
-                                    <Image Source="/Friend_Request.png"  Width="60" Height="69"
-                                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                                    <TextBlock Text="Requests" Margin="0,5,0,0" Foreground="White" TextAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="border" Property="Background" Value="#3DFFFFFF"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-
-                <Button Background="Transparent" BorderThickness="0" Foreground="White" FontSize="12" FontWeight="Medium" Margin="0,50,0,0"  Click="ChatButton_Click">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="border" CornerRadius="10" Background="Transparent" Padding="10,8">
-                                <StackPanel>
-                                    <Image Source="/Chat_1.png" Width="54" Height="59"
-                                           RenderOptions.BitmapScalingMode="HighQuality"/>
-                                    <TextBlock Text="Chat" Margin="0,5,0,0" Foreground="White" TextAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="border" Property="Background" Value="#3DFFFFFF"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
-
-                <Button Background="Transparent" BorderThickness="0" Foreground="White" FontSize="12" FontWeight="Medium" Margin="0,105,10,10" Click="Button_Click" Height="55">
-                    <Button.Template>
-                        <ControlTemplate TargetType="Button">
-                            <Border x:Name="border" CornerRadius="10" Background="Transparent" Padding="10,8">
-                                <StackPanel Height="87">
-                                    <Image  Width="59" Height="58"
-                                           RenderOptions.BitmapScalingMode="HighQuality">
-                                        <Image.OpacityMask>
-                                            <ImageBrush />
-                                        </Image.OpacityMask>
-                                    </Image>
-                                    <TextBlock Text="" Margin="0,5,0,0" Foreground="White" TextAlignment="Center"/>
-                                </StackPanel>
-                            </Border>
-                            <ControlTemplate.Triggers>
-                                <Trigger Property="IsMouseOver" Value="True">
-                                    <Setter TargetName="border" Property="Background" Value="#3DFFFFFF"/>
-                                </Trigger>
-                            </ControlTemplate.Triggers>
-                        </ControlTemplate>
-                    </Button.Template>
-                </Button>
+                <Button Style="{StaticResource SideButton}"
+                Margin="0,22,0,0"
+                Click="ChatButton_Click"
+                Tag="Chat"
+                Content="/Chat_1.png"/>
+                <!--
+                <Button Style="{StaticResource SideButton}"
+                Margin="0,22,0,0"
+                Click="Button_Click"
+                Tag="Settings"
+                Content="/Settings.png"/>
+                -->
             </StackPanel>
         </Border>
 
-
-        <Grid Grid.Column="1">
+        <Grid Grid.Column="1" Margin="10">
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto"/>
                 <RowDefinition Height="*"/>
             </Grid.RowDefinitions>
 
-
-            <Border Grid.Row="0" Background="#FF6C5CE7" CornerRadius="10,10,10,10">
+            <Border Grid.Row="0" Style="{StaticResource HeaderCard}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*" />
-                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
 
-                    <TextBlock Text="Extrovet" 
-                   FontSize="24"
-                   FontWeight="Bold"
-                   Foreground="White"
-                   HorizontalAlignment="Center"
-                   VerticalAlignment="Center"
-                   Margin="0,10"/>
+                    <TextBlock Text="Extrovet"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center"
+                     Margin="0,10"
+                     FontSize="22"
+                     FontWeight="SemiBold">
+                        <TextBlock.Foreground>
+                            <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                <GradientStop Color="#00C9FF" Offset="0"/>
+                                <GradientStop Color="#92FE9D" Offset="1"/>
+                            </LinearGradientBrush>
+                        </TextBlock.Foreground>
+                    </TextBlock>
 
                     <Button Grid.Column="1"
-        Width="30"
-        Height="30"
-        Margin="10"
-        VerticalAlignment="Center"
-        FontSize="18"
-        ToolTip="Reload"
-        Click="ReloadButton_Click"
-        Background="Transparent"
-        BorderThickness="0"
-        Foreground="White"
-        Cursor="Hand">
-                        🔄
+                  Style="{StaticResource IconButton}"
+                  ToolTip="Reload"
+                  Click="ReloadButton_Click"
+                  Margin="12">
+                        <TextBlock Text="🔄" FontSize="18"/>
                     </Button>
                 </Grid>
             </Border>
 
-
-            <Border Grid.Row="1" Background="White" CornerRadius="10" Margin="10">
+            <Border Grid.Row="1"
+              CornerRadius="12"
+              Background="#10FFFFFF"
+              BorderBrush="#14FFFFFF"
+              BorderThickness="1"
+              Margin="0,10,0,0">
+                <Border.Effect>
+                    <DropShadowEffect Color="#5500C9FF" BlurRadius="16" ShadowDepth="0" Opacity="0.35"/>
+                </Border.Effect>
                 <ContentControl x:Name="MainContent"
-                                HorizontalContentAlignment="Stretch"
-                                VerticalContentAlignment="Stretch"/>
+                        HorizontalContentAlignment="Stretch"
+                        VerticalContentAlignment="Stretch"/>
             </Border>
         </Grid>
     </Grid>

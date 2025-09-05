@@ -3,33 +3,64 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             xmlns:local="clr-namespace:Connectt"
              mc:Ignorable="d" 
              d:DesignHeight="450" d:DesignWidth="800">
-    <UserControl.Resources>
 
-        <Style x:Key="ActionButtonStyle" TargetType="Button">
-            <Setter Property="Width" Value="100"/>
-            <Setter Property="Height" Value="32"/>
-            <Setter Property="FontSize" Value="14"/>
-            <Setter Property="FontWeight" Value="SemiBold"/>
-            <Setter Property="Foreground" Value="White"/>
-            <Setter Property="Cursor" Value="Hand"/>
+    <UserControl.Resources>
+        <SolidColorBrush x:Key="Ink" Color="#E6FFFFFF"/>
+        <SolidColorBrush x:Key="GlassFill" Color="#10FFFFFF"/>
+        <SolidColorBrush x:Key="GlassStroke" Color="#14FFFFFF"/>
+        <LinearGradientBrush x:Key="NeonGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#00C9FF" Offset="0"/>
+            <GradientStop Color="#92FE9D" Offset="1"/>
+        </LinearGradientBrush>
+
+        <Style x:Key="HeaderCard" TargetType="Border">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Background" Value="{StaticResource GlassFill}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassStroke}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#6600C9FF" BlurRadius="16" ShadowDepth="0" Opacity="0.4"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RoundedTextBox" TargetType="TextBox">
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="Background" Value="#1AFFFFFF"/>
+            <Setter Property="BorderBrush" Value="#26FFFFFF"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="10"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="border" 
-                                Background="{TemplateBinding Background}"
-                                CornerRadius="6"
-                                BorderThickness="0">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border x:Name="Bd"
+                    Background="{TemplateBinding Background}"
+                    BorderBrush="{TemplateBinding BorderBrush}"
+                    BorderThickness="{TemplateBinding BorderThickness}"
+                    CornerRadius="10">
+                            <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.8"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="border" Property="Opacity" Value="0.6"/>
+                            <Trigger Property="IsKeyboardFocused" Value="True">
+                                <Setter TargetName="Bd" Property="BorderBrush">
+                                    <Setter.Value>
+                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
+                                            <GradientStop Color="#00C9FF" Offset="0"/>
+                                            <GradientStop Color="#92FE9D" Offset="1"/>
+                                        </LinearGradientBrush>
+                                    </Setter.Value>
+                                </Setter>
+                                <Setter TargetName="Bd" Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#4400C9FF" BlurRadius="12" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -37,120 +68,173 @@
             </Setter>
         </Style>
 
+        <Style x:Key="PrimaryButton" TargetType="Button">
+            <Setter Property="Width" Value="120"/>
+            <Setter Property="Height" Value="36"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Background" Value="{StaticResource NeonGradient}"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="bd" CornerRadius="10" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
+                                <Setter Property="Effect">
+                                    <Setter.Value>
+                                        <DropShadowEffect Color="#9900C9FF" BlurRadius="14" ShadowDepth="0"/>
+                                    </Setter.Value>
+                                </Setter>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
 
-        <Style TargetType="ListViewItem">
+        <Style x:Key="SuccessButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#FF4CAF50"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="32"/>
+        </Style>
+        <Style x:Key="DangerButton" TargetType="Button" BasedOn="{StaticResource PrimaryButton}">
+            <Setter Property="Background" Value="#FFF44336"/>
+            <Setter Property="Width" Value="100"/>
+            <Setter Property="Height" Value="32"/>
+        </Style>
+
+        <Style x:Key="RequestRow" TargetType="ListViewItem">
+            <Setter Property="Padding" Value="0"/>
+            <Setter Property="Margin" Value="0,0,0,1"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Background" Value="#08FFFFFF"/>
             <Style.Triggers>
-                <Trigger Property="ItemsControl.AlternationIndex" Value="0">
-                    <Setter Property="Background" Value="White"/>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="#16FFFFFF"/>
+                    <Setter Property="Effect">
+                        <Setter.Value>
+                            <DropShadowEffect Color="#3300C9FF" BlurRadius="10" ShadowDepth="0"/>
+                        </Setter.Value>
+                    </Setter>
                 </Trigger>
-                <Trigger Property="ItemsControl.AlternationIndex" Value="1">
-                    <Setter Property="Background" Value="#FFF5F5F5"/>
+                <Trigger Property="IsSelected" Value="True">
+                    <Setter Property="Background" Value="#22FFFFFF"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
+
+        <!-- Circular avatar mask -->
+        <Style x:Key="AvatarWrap" TargetType="Border">
+            <Setter Property="Width" Value="40"/>
+            <Setter Property="Height" Value="40"/>
+            <Setter Property="CornerRadius" Value="20"/>
+            <Setter Property="Background" Value="#14FFFFFF"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#5500C9FF" BlurRadius="8" ShadowDepth="0" Opacity="0.35"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </UserControl.Resources>
 
-    <Grid>
+    <Grid Background="Transparent">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <Border Grid.Row="0" Background="#FFE8EAF6" CornerRadius="10" Margin="10,10,10,0" Padding="15">
-            <StackPanel Orientation="Horizontal">
-                <TextBox x:Name="SearchTextBox" 
-                         Width="300" 
-                         Height="40" 
-                         FontSize="14"
-                         Padding="10,0"
-                         VerticalContentAlignment="Center"
-                         
-                         />
-
-                <Button x:Name="SendRequestButton" 
-                        Content="Send Request" 
-                        Margin="15,0,0,0"
-                        Width="140"
-                        Height="40"
-                        Background="#FFCC6196"
-                        Foreground="White"
-                        FontWeight="SemiBold"
-                        FontSize="14"
-                        Click="SendRequestButton_Click"
-                        Cursor="Hand"
-                        Style="{StaticResource ActionButtonStyle}"/>
+        <!-- Search + Send -->
+        <Border Grid.Row="0" Style="{StaticResource HeaderCard}" Margin="10,10,10,0">
+            <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                <TextBox x:Name="SearchTextBox"
+                 Width="300"
+                 Style="{StaticResource RoundedTextBox}"
+                 FontSize="14"
+                 ToolTip="Type a username to search"/>
+                <Button x:Name="SendRequestButton"
+                Content="Send Request"
+                Margin="15,0,0,0"
+                Click="SendRequestButton_Click"
+                Style="{StaticResource PrimaryButton}"/>
             </StackPanel>
         </Border>
 
-
-        <Border Grid.Row="1" Background="White" CornerRadius="10" Margin="10">
+        <!-- Requests list card -->
+        <Border Grid.Row="1"
+            CornerRadius="12"
+            Background="#0FFFFFFF"
+            BorderBrush="{StaticResource GlassStroke}"
+            BorderThickness="1"
+            Margin="10">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <Border Grid.Row="0" Background="#FF5D43C3" CornerRadius="10,10,0,0">
-                    <Grid>
-                        <Grid.ColumnDefinitions>
-                            <ColumnDefinition Width="*"/>
-                            <ColumnDefinition Width="Auto"/>
-                            <ColumnDefinition Width="Auto"/>
-                        </Grid.ColumnDefinitions>
-
-                        <TextBlock Text="Friend Requests" 
-                                   Grid.Column="0"
-                                   Foreground="White"
-                                   FontSize="16"
-                                   FontWeight="Bold"
-                                   Margin="15,10"/>
-                    </Grid>
+                <Border Grid.Row="0"
+                CornerRadius="12,12,0,0"
+                Background="{StaticResource NeonGradient}">
+                    <TextBlock Text="Friend Requests"
+                     Foreground="White"
+                     FontSize="16"
+                     FontWeight="Bold"
+                     Margin="15,10"/>
                 </Border>
 
-                <!-- Requests List -->
-                <ListView x:Name="RequestsListView" 
-                          Grid.Row="1"
-                          BorderThickness="0"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          AlternationCount="2">
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="Padding" Value="0"/>
-                            <Setter Property="Margin" Value="0,0,0,1"/>
-                            <Setter Property="BorderThickness" Value="0"/>
-                        </Style>
-                    </ListView.ItemContainerStyle>
-
+                <ListView x:Name="RequestsListView"
+                  Grid.Row="1"
+                  BorderThickness="0"
+                  ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                  ItemContainerStyle="{StaticResource RequestRow}">
                     <ListView.ItemTemplate>
                         <DataTemplate>
-                            <Border Padding="15,10" BorderBrush="#FFEEEEEE" BorderThickness="0,0,0,1">
+                            <Border Padding="12,10" BorderBrush="#11FFFFFF" BorderThickness="0,0,0,1">
                                 <Grid VerticalAlignment="Center">
                                     <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="3*"/>
                                         <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="50"/>
+                                        <ColumnDefinition Width="10"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="Auto"/>
+                                        <ColumnDefinition Width="16"/>
                                         <ColumnDefinition Width="Auto"/>
                                     </Grid.ColumnDefinitions>
 
-                                    <TextBlock Text="{Binding Name}" 
-                                               Grid.Column="0"
-                                               VerticalAlignment="Center"
-                                               FontSize="14"
-                                               Margin="50,0"/>
+                                    <!-- Avatar -->
+                                    <Border Grid.Column="0" Style="{StaticResource AvatarWrap}">
+                                        <Image Source="{Binding Image, FallbackValue=/User_Avatar.png}"
+                           Stretch="UniformToFill"
+                           RenderOptions.BitmapScalingMode="HighQuality"
+                           ClipToBounds="True"/>
+                                    </Border>
 
-                                    <Button Content="Accept" 
-                                            Grid.Column="1"
-                                            Style="{StaticResource ActionButtonStyle}"
-                                            Background="#FF4CAF50"
-                                            Click="AcceptButton_Click"
-                                            Tag="{Binding Id}"/>
+                                    <!-- Name -->
+                                    <TextBlock Grid.Column="2"
+                             Text="{Binding Name}"
+                             VerticalAlignment="Center"
+                             FontSize="14"
+                             Foreground="{StaticResource Ink}"/>
 
-                                    <Button Content="Deny" 
-                                            Grid.Column="3"
-                                            Style="{StaticResource ActionButtonStyle}"
-                                            Background="#FFF44336"
-                                            Click="DenyButton_Click"
-                                            Tag="{Binding Id}"/>
+                                    <!-- Accept / Deny -->
+                                    <Button Grid.Column="3"
+                          Content="Accept"
+                          Style="{StaticResource SuccessButton}"
+                          Tag="{Binding Id}"
+                          Click="AcceptButton_Click"/>
+                                    <Button Grid.Column="5"
+                          Content="Deny"
+                          Style="{StaticResource DangerButton}"
+                          Tag="{Binding Id}"
+                          Click="DenyButton_Click"/>
                                 </Grid>
                             </Border>
                         </DataTemplate>
