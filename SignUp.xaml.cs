@@ -50,7 +50,7 @@ namespace Connectt
         private void GetInfo(object sender, RoutedEventArgs e)
         {
             // Keep original x:Name controls: Name, gmail
-            name = Name.Text?.ToString();
+            name = NameTextBox.Text?.ToString();
             gml = gmail.Text?.ToString();
 
             if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(gml))

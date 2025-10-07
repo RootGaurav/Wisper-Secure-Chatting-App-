@@ -140,18 +140,68 @@
 
         <Border Grid.Column="0" Style="{StaticResource Sidebar}">
             <StackPanel VerticalAlignment="Center" Margin="0,24,0,24">
+                <!--
                 <Button Style="{StaticResource SideButton}"
                 Click="FriendRequestButton_Click"
                 Tag="Requests"
                 
                         
                  />
+                -->
+                <!--
 
                 <Button Style="{StaticResource SideButton}"
                 Margin="0,22,0,0"
                 Click="ChatButton_Click"
-                Tag="Chat"
-                Content="/Chat_1.png"/>
+                Tag="Chat" >
+                    <ImageBrush ImageSource="/Chat_1.png" />
+
+                </Button>
+                -->
+                <Button Background="Transparent" BorderThickness="0" Foreground="White" FontSize="12" FontWeight="Medium" Click="FriendRequestButton_Click">
+                    <Button.OpacityMask>
+                        <ImageBrush ImageSource="/Friend_Request.png"/>
+                    </Button.OpacityMask>
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" CornerRadius="10" Background="Transparent" Padding="10,8">
+                                <StackPanel>
+                                    <Image Source="/Friend_Request.png"  Width="60" Height="69"
+                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    <TextBlock Text="Requests" Margin="0,5,0,0" Foreground="White" TextAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#3DFFFFFF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+
+                <Button Style="{StaticResource SideButton}"  BorderThickness="0" Foreground="White" FontSize="12" FontWeight="Medium" Margin="0,50,0,0"  Click="ChatButton_Click">
+                    <Button.Template>
+                        <ControlTemplate TargetType="Button">
+                            <Border x:Name="border" CornerRadius="10" Background="Transparent" Padding="10,8">
+                                <StackPanel>
+                                    <Image Source="/Chat_1.png" Width="54" Height="59"
+                                           RenderOptions.BitmapScalingMode="HighQuality"/>
+                                    <TextBlock Text="Chat" Margin="0,5,0,0" Foreground="White" TextAlignment="Center"/>
+                                </StackPanel>
+                            </Border>
+                            <ControlTemplate.Triggers>
+                                <Trigger Property="IsMouseOver" Value="True">
+                                    <Setter TargetName="border" Property="Background" Value="#3DFFFFFF"/>
+                                </Trigger>
+                            </ControlTemplate.Triggers>
+                        </ControlTemplate>
+                    </Button.Template>
+                </Button>
+
+
+
                 <!--
                 <Button Style="{StaticResource SideButton}"
                 Margin="0,22,0,0"
