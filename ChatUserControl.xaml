@@ -5,48 +5,43 @@
              Height="Auto" Width="Auto">
 
     <UserControl.Resources>
-        <!-- Palette -->
-        <SolidColorBrush x:Key="Ink" Color="#E6FFFFFF"/>
-        <SolidColorBrush x:Key="InkSubtle" Color="#A0FFFFFF"/>
-        <SolidColorBrush x:Key="GlassFill" Color="#10FFFFFF"/>
-        <SolidColorBrush x:Key="GlassStroke" Color="#14FFFFFF"/>
-
-        <LinearGradientBrush x:Key="NeonGradient" StartPoint="0,0" EndPoint="1,0">
-            <GradientStop Color="#00C9FF" Offset="0"/>
-            <GradientStop Color="#92FE9D" Offset="1"/>
-        </LinearGradientBrush>
+        <!-- Updated Palette -->
+        <SolidColorBrush x:Key="Ink" Color="#026670"/>
+        <SolidColorBrush x:Key="InkSubtle" Color="#6080807A"/>
+        <SolidColorBrush x:Key="GlassFill" Color="#C0FEF9C7"/>
+        <SolidColorBrush x:Key="GlassStroke" Color="#60996670"/>
 
         <!-- Sidebar -->
         <Style x:Key="Sidebar" TargetType="Border">
-            <Setter Property="Background" Value="#16202A"/>
+            <Setter Property="Background" Value="#9FEDD7"/>
             <Setter Property="CornerRadius" Value="12,0,0,12"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect Color="#6600C9FF" BlurRadius="16" ShadowDepth="0" Opacity="0.35"/>
+                    <DropShadowEffect Color="#60996670" BlurRadius="10" ShadowDepth="0" Opacity="0.3"/>
                 </Setter.Value>
             </Setter>
         </Style>
 
         <!-- Friend item container -->
         <Style x:Key="FriendItem" TargetType="Border">
-            <Setter Property="Background" Value="#1AFFFFFF"/>
+            <Setter Property="Background" Value="#C0FFFFFF"/>
             <Setter Property="CornerRadius" Value="10"/>
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Margin" Value="6,4"/>
             <Setter Property="SnapsToDevicePixels" Value="True"/>
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
-                    <Setter Property="Background" Value="#26FFFFFF"/>
+                    <Setter Property="Background" Value="#E0F7ED"/>
                     <Setter Property="Effect">
                         <Setter.Value>
-                            <DropShadowEffect Color="#9900C9FF" BlurRadius="12" ShadowDepth="0"/>
+                            <DropShadowEffect Color="#8034A853" BlurRadius="8" ShadowDepth="1"/>
                         </Setter.Value>
                     </Setter>
                 </Trigger>
             </Style.Triggers>
         </Style>
 
-        <!-- Friends ListBox chrome -->
+        <!-- Friends ListBox style -->
         <Style x:Key="FriendsListStyle" TargetType="ListBox">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -57,8 +52,8 @@
         <!-- Message input TextBox -->
         <Style x:Key="InputTextBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="#222"/>
-            <Setter Property="Background" Value="#F7F9FB"/>
-            <Setter Property="BorderBrush" Value="#D0D7DE"/>
+            <Setter Property="Background" Value="#F0FAF7"/>
+            <Setter Property="BorderBrush" Value="#B0DAB8"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Padding" Value="10"/>
             <Setter Property="Height" Value="40"/>
@@ -67,25 +62,18 @@
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
                         <Border x:Name="Bd"
-                    Background="{TemplateBinding Background}"
-                    BorderBrush="{TemplateBinding BorderBrush}"
-                    BorderThickness="{TemplateBinding BorderThickness}"
-                    CornerRadius="10">
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="10">
                             <ScrollViewer x:Name="PART_ContentHost"/>
                         </Border>
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
-                                <Setter TargetName="Bd" Property="BorderBrush">
-                                    <Setter.Value>
-                                        <LinearGradientBrush StartPoint="0,0" EndPoint="1,0">
-                                            <GradientStop Color="#00C9FF" Offset="0"/>
-                                            <GradientStop Color="#92FE9D" Offset="1"/>
-                                        </LinearGradientBrush>
-                                    </Setter.Value>
-                                </Setter>
+                                <Setter TargetName="Bd" Property="BorderBrush" Value="#3BB86F"/>
                                 <Setter TargetName="Bd" Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="#4400C9FF" BlurRadius="10" ShadowDepth="0"/>
+                                        <DropShadowEffect Color="#8B68E046" BlurRadius="6" ShadowDepth="0"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
@@ -103,7 +91,7 @@
             <Setter Property="FontWeight" Value="SemiBold"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Background" Value="{StaticResource NeonGradient}"/>
+            <Setter Property="Background" Value="#3BB86F"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Template">
                 <Setter.Value>
@@ -116,12 +104,12 @@
                                 <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
                                 <Setter Property="Effect">
                                     <Setter.Value>
-                                        <DropShadowEffect Color="#9900C9FF" BlurRadius="14" ShadowDepth="0"/>
+                                        <DropShadowEffect Color="#6DB86E" BlurRadius="10" ShadowDepth="0"/>
                                     </Setter.Value>
                                 </Setter>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
+                                <Setter TargetName="bd" Property="Opacity" Value="0.8"/>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -132,12 +120,12 @@
         <!-- Messages card -->
         <Style x:Key="GlassCard" TargetType="Border">
             <Setter Property="CornerRadius" Value="12"/>
-            <Setter Property="Background" Value="#10FFFFFF"/>
+            <Setter Property="Background" Value="#AAFFFFFF"/>
             <Setter Property="BorderBrush" Value="{StaticResource GlassStroke}"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Effect">
                 <Setter.Value>
-                    <DropShadowEffect Color="#5500C9FF" BlurRadius="16" ShadowDepth="0" Opacity="0.35"/>
+                    <DropShadowEffect Color="#558BCB75" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -153,34 +141,33 @@
         <Border Grid.Column="0" Style="{StaticResource Sidebar}" Padding="8">
             <StackPanel>
                 <TextBlock Text="Chats"
-                   FontSize="20"
-                   Foreground="{StaticResource Ink}"
-                   FontWeight="SemiBold"
-                   Margin="8,8,8,6"/>
+                           FontSize="20"
+                           Foreground="{StaticResource Ink}"
+                           FontWeight="SemiBold"
+                           Margin="8,8,8,6"/>
                 <Border CornerRadius="10"
-                Background="#0FFFFFFF"
-                BorderBrush="{StaticResource GlassStroke}"
-                BorderThickness="1"
-                Padding="4">
+                        Background="#55FFFFFF"
+                        BorderBrush="{StaticResource GlassStroke}"
+                        BorderThickness="1"
+                        Padding="4">
                     <ListBox x:Name="FriendsList"
-                   Style="{StaticResource FriendsListStyle}"
-                   Foreground="{StaticResource Ink}"
-                   SelectionChanged="FriendsList_SelectionChanged">
+                             Style="{StaticResource FriendsListStyle}"
+                             Foreground="{StaticResource Ink}"
+                             SelectionChanged="FriendsList_SelectionChanged">
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Style="{StaticResource FriendItem}">
                                     <DockPanel LastChildFill="True">
-                                        <!-- Optional avatar if model has Image -->
-                                        <Border Width="36" Height="36" CornerRadius="18" Background="#14FFFFFF" Margin="0,0,8,0">
+                                        <Border Width="36" Height="36" CornerRadius="18" Background="#33FFFFFF" Margin="0,0,8,0">
                                             <Image Source="{Binding Image, FallbackValue=/User_Avatar.png}"
-                             Stretch="UniformToFill"
-                             RenderOptions.BitmapScalingMode="HighQuality"
-                             ClipToBounds="True"/>
+                                                   Stretch="UniformToFill"
+                                                   RenderOptions.BitmapScalingMode="HighQuality"
+                                                   ClipToBounds="True"/>
                                         </Border>
                                         <TextBlock Text="{Binding Name}"
-                               FontWeight="SemiBold"
-                               Foreground="{StaticResource Ink}"
-                               VerticalAlignment="Center"/>
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{StaticResource Ink}"
+                                                   VerticalAlignment="Center"/>
                                     </DockPanel>
                                 </Border>
                             </DataTemplate>
@@ -208,15 +195,15 @@
             <Border Grid.Row="1" Style="{StaticResource GlassCard}" Margin="0,10,0,0" Padding="6">
                 <DockPanel LastChildFill="False">
                     <TextBox x:Name="MessageTextBox"
-                   Width="Auto"
-                   MinWidth="200"
-                   Style="{StaticResource InputTextBox}"
-                   Margin="4,2,6,2"
-                   DockPanel.Dock="Left"/>
+                             Width="Auto"
+                             MinWidth="200"
+                             Style="{StaticResource InputTextBox}"
+                             Margin="4,2,6,2"
+                             DockPanel.Dock="Left"/>
                     <Button Content="Send"
-                  Style="{StaticResource PrimaryButton}"
-                  Margin="0,2,4,2"
-                  Click="SendButton_Click"/>
+                            Style="{StaticResource PrimaryButton}"
+                            Margin="0,2,4,2"
+                            Click="SendButton_Click"/>
                 </DockPanel>
             </Border>
         </Grid>

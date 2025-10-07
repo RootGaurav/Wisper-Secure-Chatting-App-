@@ -4,6 +4,147 @@
              xmlns:local="clr-namespace:Connectt"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-         
+
+        <!-- Color Palette from your image -->
+        <SolidColorBrush x:Key="PrimaryDarkTeal" Color="#026670"/>
+        <SolidColorBrush x:Key="AquaMint" Color="#9FEDD7"/>
+        <SolidColorBrush x:Key="SoftYellow" Color="#FEF9C7"/>
+        <SolidColorBrush x:Key="WarmYellow" Color="#FCE181"/>
+        <SolidColorBrush x:Key="LightBeige" Color="#EDEAE5"/>
+
+        <!-- UI Element Colors -->
+        <SolidColorBrush x:Key="BackgroundBrush" Color="#EDEAE5"/>
+        <SolidColorBrush x:Key="SidebarBrush" Color="#9FEDD7"/>
+        <SolidColorBrush x:Key="AccentBrush" Color="#026670"/>
+        <SolidColorBrush x:Key="Ink" Color="#026670"/>
+        <SolidColorBrush x:Key="GlassStroke" Color="#40026670"/>
+        <SolidColorBrush x:Key="HoverBrush" Color="#FCE181"/>
+        <SolidColorBrush x:Key="PressedBrush" Color="#FEF9C7"/>
+
+        <!-- Gradients -->
+        <LinearGradientBrush x:Key="NeonGradient" StartPoint="0,0" EndPoint="1,0">
+            <GradientStop Color="#026670" Offset="0"/>
+            <GradientStop Color="#9FEDD7" Offset="1"/>
+        </LinearGradientBrush>
+
+        <LinearGradientBrush x:Key="WarmGradient" StartPoint="0,0" EndPoint="1,1">
+            <GradientStop Color="#FCE181" Offset="0"/>
+            <GradientStop Color="#FEF9C7" Offset="1"/>
+        </LinearGradientBrush>
+
+        <!-- Styles -->
+        <Style x:Key="GlassButton" TargetType="Button">
+            <Setter Property="Background" Value="#30FCE181"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassStroke}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" 
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#50FCE181"/>
+                            </Trigger>
+                            <Trigger Property="IsPressed" Value="True">
+                                <Setter Property="Background" Value="#70FEF9C7"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RoundedTextBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#30FEF9C7"/>
+            <Setter Property="Foreground" Value="{StaticResource Ink}"/>
+            <Setter Property="BorderBrush" Value="{StaticResource GlassStroke}"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="FontSize" Value="14"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="8">
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="4"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused" Value="True">
+                                <Setter Property="BorderBrush" Value="{StaticResource AccentBrush}"/>
+                                <Setter Property="BorderThickness" Value="2"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="InputTextBox" TargetType="TextBox" BasedOn="{StaticResource RoundedTextBox}">
+            <Setter Property="MinHeight" Value="35"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+        </Style>
+
+        <Style x:Key="FriendsListStyle" TargetType="ListBox">
+            <Setter Property="Background" Value="Transparent"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="ItemTemplate">
+                <Setter.Value>
+                    <DataTemplate>
+                        <Border Background="#20FEF9C7" 
+                                CornerRadius="8" 
+                                Margin="4,2" 
+                                Padding="8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/>
+                                    <ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Ellipse Width="40" Height="40" 
+                                         Fill="{StaticResource NeonGradient}"
+                                         Grid.Column="0"
+                                         Margin="0,0,10,0"/>
+                                <TextBlock Text="{Binding Name}" 
+                                           Grid.Column="1"
+                                           FontWeight="SemiBold"
+                                           Foreground="{StaticResource Ink}"
+                                           VerticalAlignment="Center"/>
+                            </Grid>
+                        </Border>
+                    </DataTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="RequestRow" TargetType="ListBoxItem">
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="ListBoxItem">
+                        <Border Background="#20FCE181" 
+                                CornerRadius="8" 
+                                Margin="5,2" 
+                                Padding="10">
+                            <ContentPresenter/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#40FCE181"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
     </Application.Resources>
 </Application>

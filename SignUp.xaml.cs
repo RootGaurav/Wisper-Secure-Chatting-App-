@@ -112,6 +112,27 @@ namespace Connectt
         }
 
         // Called by "Verify OTP" button
+        private void ShowSignUp_Click(object sender, RoutedEventArgs e)
+        {
+            SignUpForm.Visibility = Visibility.Visible;
+            SignInForm.Visibility = Visibility.Collapsed;
+            TabSignUp.Style = (Style)Resources["PrimaryButton"];
+            TabSignIn.Style = (Style)Resources["SecondaryButton"];
+        }
+
+        private void ShowSignIn_Click(object sender, RoutedEventArgs e)
+        {
+            SignUpForm.Visibility = Visibility.Collapsed;
+            SignInForm.Visibility = Visibility.Visible;
+            TabSignUp.Style = (Style)Resources["SecondaryButton"];
+            TabSignIn.Style = (Style)Resources["PrimaryButton"];
+        }
+
+        private void SignIn_Click(object sender, RoutedEventArgs e)
+        {
+            // existing sign-in logic or placeholder; will integrate with your backend
+        }
+
         private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
         {
             // PasswordBox has Password, not Text
