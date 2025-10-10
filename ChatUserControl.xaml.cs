@@ -58,7 +58,7 @@ namespace Connectt
             displayedMessages.Clear();
             MessagesPanel.Children.Clear();
             var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"https://connect-api-4.onrender.com/get_messages?name={Session.name}&from={friendName}");
+            var response = await httpClient.GetAsync($"http://127.0.0.1:5000/get_messages?name={Session.name}&from={friendName}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -139,7 +139,7 @@ namespace Connectt
         {
             displayedMessages.Clear();
             var httpClient = new HttpClient();
-            var response = await httpClient.GetAsync($"https://connect-api-4.onrender.com/get_messages?name={Session.name}&from={friendName}");
+            var response = await httpClient.GetAsync($"http://127.0.0.1:5000/get_messages?name={Session.name}&from={friendName}");
 
             if (response.IsSuccessStatusCode)
             {
@@ -257,7 +257,7 @@ namespace Connectt
                 }), Encoding.UTF8, "application/json");
 
                 var httpClient = new HttpClient();
-                var response = await httpClient.PostAsync("https://connect-api-4.onrender.com/send_message", content);
+                var response = await httpClient.PostAsync("http://127.0.0.1:5000/send_message", content);
 
                 if (!response.IsSuccessStatusCode)
                 {
@@ -270,6 +270,13 @@ namespace Connectt
                 
                MessageTextBox.Clear();
             }
+        }
+
+        private void AttachFileButton_Click(object sender, RoutedEventArgs e)
+        {
+            // TODO: integrate file‐pick and send logic later.
+            MessageBox.Show("Attach file clicked – feature coming soon!",
+                            "File Attach", MessageBoxButton.OK, MessageBoxImage.Information);
         }
 
     }

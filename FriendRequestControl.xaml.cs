@@ -1,6 +1,5 @@
-﻿using Newtonsoft.Json; 
+﻿using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net.Http;
@@ -15,24 +14,27 @@ namespace Connectt
     {
         public class FriendRequestModel
         {
-            public string ?Name { get; set; }
+            public string? Name { get; set; }
             public string? Id { get; set; }
         }
+
         Session2 s2;
         private static readonly HttpClient client = new HttpClient();
-        private static readonly string APIDenUrl = "https://connect-api-4.onrender.com/respond_request";
-        private static readonly string ApiSed_Req = "https://connect-api-4.onrender.com/send_friend_request";
-        private static readonly string APIAcceptUrl = "https://connect-api-4.onrender.com/respond_request";
-        public static  ObservableCollection<FriendRequestModel>? FriendRequests { get; set; }
-        
+        private static readonly string APIDenUrl = "http://127.0.0.1:5000/respond_request";
+        private static readonly string ApiSed_Req = "http://127.0.0.1:5000/send_friend_request";
+        private static readonly string APIAcceptUrl = "http://127.0.0.1:5000/respond_request";
+
+        // Initialize the collection so it’s never null
+        public static ObservableCollection<FriendRequestModel>? FriendRequests { get; set; }
+            = new ObservableCollection<FriendRequestModel>();
+
         public FriendRequestControl()
         {
             InitializeComponent();
-           // FriendRequests = new ObservableCollection<FriendRequestModel>();
-            RequestsListView.ItemsSource = FriendRequests;
-           // RequestsListView.ItemsSource = Session2.FriendRequests;
 
-            //LoadIncomingRequests();
+            // Bind and load on startup
+            RequestsListView.ItemsSource = FriendRequests;
+            _ = LoadIncomingRequests();
         }
 
         private async void SendRequestButton_Click(object sender, RoutedEventArgs e)
@@ -48,27 +50,20 @@ namespace Connectt
 
             try
             {
-               
-                    var data = new
-                    {
-                        sender = senderName,
-                        receiver = receiverName
-                    };
+                var data = new { sender = senderName, receiver = receiverName };
+                var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-                    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+                var result = await client.PostAsync(ApiSed_Req, content);
 
-                    var result = await client.PostAsync(ApiSed_Req, content);
-
-                    if (result.IsSuccessStatusCode)
-                    {
-                        MessageBox.Show("Friend request sent.");
-                    }
-                    else
-                    {
-                        MessageBox.Show("Failed to send request.");
-                    }
-                
-               
+                if (result.IsSuccessStatusCode)
+                {
+                    MessageBox.Show("Friend request sent.");
+                    await LoadIncomingRequests();
+                }
+                else
+                {
+                    MessageBox.Show("Failed to send request.");
+                }
             }
             catch (Exception ex)
             {
@@ -76,28 +71,26 @@ namespace Connectt
             }
         }
 
-        private async void LoadIncomingRequests()
+        private async Task LoadIncomingRequests()
         {
             string user = Session.name;
 
             try
             {
-                var response = await client.GetAsync($"https://connect-api-4.onrender.com/get_requests?name={user}");
+                var response = await client.GetAsync($"http://127.0.0.1:5000/get_requests?name={user}");
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();
                     var requests = JsonConvert.DeserializeObject<string[]>(json);
 
-                 
-                    if (requests != null && requests.Any())
+                    if (requests != null)
                     {
-                        FriendRequests.Clear();
+                        FriendRequests?.Clear();
                         foreach (var name in requests)
                         {
-                            FriendRequests.Add(new FriendRequestModel { Name = name ,Id=name});
+                            FriendRequests?.Add(new FriendRequestModel { Name = name, Id = name });
                         }
                     }
-                   
                 }
             }
             catch (Exception ex)
@@ -111,21 +104,12 @@ namespace Connectt
             string senderName = (string)((Button)sender).Tag;
             string receiverName = Session.name;
 
-            var data = new
-            {
-                sender = senderName,
-                receiver = receiverName,
-                status = 1 
-            };
-
+            var data = new { sender = senderName, receiver = receiverName, status = 1 };
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             await client.PostAsync(APIAcceptUrl, content);
 
             MessageBox.Show("Request accepted.");
-            s2 = new Session2();
-            await s2.LoadIncomingRequests();
-            FriendRequests.Clear();
-            return;
+            await LoadIncomingRequests();
         }
 
         private async void DenyButton_Click(object sender, RoutedEventArgs e)
@@ -133,18 +117,12 @@ namespace Connectt
             string senderName = (string)((Button)sender).Tag;
             string receiverName = Session.name;
 
-            var data = new
-            {
-                sender = senderName,
-                receiver = receiverName
-            };
-
+            var data = new { sender = senderName, receiver = receiverName };
             var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
             await client.PostAsync(APIDenUrl, content);
 
             MessageBox.Show("Request denied.");
-            s2 = new Session2();
-            await s2.LoadIncomingRequests();
+            await LoadIncomingRequests();
         }
     }
 }

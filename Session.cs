@@ -15,7 +15,7 @@ namespace Connectt
     {
         public static string name { get; set; }
         public static ObservableCollection<FriendRequestModel>? FriendRequests { get; set; }
-        public static ObservableCollection<FriendModel>? Friends { get; set; }
+        public static ObservableCollection<FriendModel> Friends { get; set; }
     }
     public class FriendModel
     {
@@ -49,7 +49,7 @@ namespace Connectt
 
             try
             {
-                var response = await client.GetAsync($"https://connect-api-4.onrender.com/get_requests?name={user}");
+                var response = await client.GetAsync($"http://127.0.0.1:5000/get_requests?name={user}");
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();
@@ -86,7 +86,7 @@ namespace Connectt
             string user = Session.name;
             try
             {
-                var response = await client.GetAsync($"https://connect-api-4.onrender.com/get_friends?name={user}");
+                var response = await client.GetAsync($"http://127.0.0.1:5000/get_friends?name={user}");
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();

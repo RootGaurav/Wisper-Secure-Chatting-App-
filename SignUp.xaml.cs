@@ -17,16 +17,14 @@ using System.IO;
 
 namespace Connectt
 {
-    /// <summary>
-    /// Interaction logic for SignUp.xaml
-    /// </summary>
     public partial class SignUp : Window
     {
         private static readonly HttpClient client = new HttpClient();
 
         // Keep original endpoints intact
-        private readonly string otpapi = "https://connect-api-4.onrender.com/register";
-        private readonly string VerifyAPI = "https://connect-api-4.onrender.com/verify";
+        private readonly string otpapi = "http://127.0.0.1:5000/register";
+        private readonly string VerifyAPI = "http://127.0.0.1:5000/verify";
+        private readonly string SignInAPI = "http://127.0.0.1:5000/signin";
 
         // Make fields nullable to satisfy C# nullable rules; actual values are set from UI
         private static string? name = null;
@@ -76,27 +74,40 @@ namespace Connectt
             try
             {
                 var response = await RegisterUserAsync(userData);
+                string responseContent = await response.Content.ReadAsStringAsync();
+                
+                // Debug output
+                Debug.WriteLine($"Response Status: {response.StatusCode}");
+                Debug.WriteLine($"Response Content: {responseContent}");
 
                 if (response.IsSuccessStatusCode)
                 {
                     ErrorTextBlock.Text = "OTP sent to your Gmail. Please enter it below.";
                     ErrorTextBlock.Visibility = Visibility.Visible;
 
-                    // Show OTP controls
-                    OTPLabel.Visibility = Visibility.Visible;
-                    OTPBox.Visibility = Visibility.Visible;
+                    // Show OTP controls - THIS WAS THE MAIN ISSUE
+                    OtpPanel.Visibility = Visibility.Visible;  // Show the entire StackPanel
                     VerifyButton.Visibility = Visibility.Visible;
+                    SignUpButton.Visibility = Visibility.Collapsed; // Hide signup button
                 }
                 else
                 {
-                    var responseContent = await response.Content.ReadAsStringAsync();
-                    // The original logic set "Name already exists" on any failure; keep it
-                    ErrorTextBlock.Text = "Name already exists";
+                    // Try to parse error message from response
+                    try
+                    {
+                        dynamic errorResponse = JsonConvert.DeserializeObject(responseContent);
+                        ErrorTextBlock.Text = errorResponse?.error?.ToString() ?? "Registration failed";
+                    }
+                    catch
+                    {
+                        ErrorTextBlock.Text = "Name already exists";
+                    }
                     ErrorTextBlock.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"Exception: {ex.Message}");
                 ErrorTextBlock.Text = "Error: " + ex.Message;
                 ErrorTextBlock.Visibility = Visibility.Visible;
             }
@@ -107,11 +118,14 @@ namespace Connectt
         {
             string json = JsonConvert.SerializeObject(userData);
             var content = new StringContent(json, Encoding.UTF8, "application/json");
+            
+            // Add timeout and better error handling
+            client.Timeout = TimeSpan.FromSeconds(30);
             HttpResponseMessage response = await client.PostAsync(otpapi, content);
             return response;
         }
 
-        // Called by "Verify OTP" button
+        // Called by "Sign Up" tab button
         private void ShowSignUp_Click(object sender, RoutedEventArgs e)
         {
             SignUpForm.Visibility = Visibility.Visible;
@@ -120,6 +134,7 @@ namespace Connectt
             TabSignIn.Style = (Style)Resources["SecondaryButton"];
         }
 
+        // Called by "Sign In" tab button  
         private void ShowSignIn_Click(object sender, RoutedEventArgs e)
         {
             SignUpForm.Visibility = Visibility.Collapsed;
@@ -128,10 +143,59 @@ namespace Connectt
             TabSignIn.Style = (Style)Resources["PrimaryButton"];
         }
 
-        private void SignIn_Click(object sender, RoutedEventArgs e)
+        private async void SignIn_Click(object sender, RoutedEventArgs e)
         {
-            // existing sign-in logic or placeholder; will integrate with your backend
+            string username = SignInUsernameTextBox.Text.Trim();
+            string userOTP = SignInPasswordBox.Password.Trim();
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(userOTP))
+            {
+                SignInError.Text = "Enter both username and OTP";
+                SignInError.Visibility = Visibility.Visible;
+                return;
+            }
+
+            var payload = new
+            {
+                name = username,
+                otp = userOTP
+            };
+
+            try
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(SignInAPI, content);
+                string body = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    SignInError.Text = "Login successful! Redirecting...";
+                    SignInError.Visibility = Visibility.Visible;
+
+                    // Persist session exactly like VerifyOtp_Click
+                    File.WriteAllText("log", username);
+                    Session.name = username;
+
+                    await Task.Delay(1000);
+
+                    new MainWindow().Show();
+                    this.Close();
+                }
+                else
+                {
+                    dynamic result = JsonConvert.DeserializeObject(body);
+                    SignInError.Text = result?.error ?? "Sign-in failed";
+                    SignInError.Visibility = Visibility.Visible;
+                }
+            }
+            catch (Exception ex)
+            {
+                SignInError.Text = "Error: " + ex.Message;
+                SignInError.Visibility = Visibility.Visible;
+            }
         }
+
+
 
         private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
         {
@@ -155,7 +219,6 @@ namespace Connectt
             try
             {
                 var content = new StringContent(JsonConvert.SerializeObject(verifyData), Encoding.UTF8, "application/json");
-                var client = new HttpClient();
                 var response = await client.PostAsync(VerifyAPI, content);
 
                 if (response.IsSuccessStatusCode)
@@ -167,20 +230,33 @@ namespace Connectt
                     if (!string.IsNullOrWhiteSpace(name))
                     {
                         File.WriteAllText("log", name);
+                        Session.name = name; // Set session name
                     }
 
+                    // Small delay to show success message
+                    await Task.Delay(1000);
+                    
                     new MainWindow().Show();
                     this.Close();
                 }
                 else
                 {
                     var resText = await response.Content.ReadAsStringAsync();
-                    ErrorTextBlock.Text = "Verification Failed: " + resText;
+                    try
+                    {
+                        dynamic errorResponse = JsonConvert.DeserializeObject(resText);
+                        ErrorTextBlock.Text = errorResponse?.error?.ToString() ?? "Verification Failed";
+                    }
+                    catch
+                    {
+                        ErrorTextBlock.Text = "Verification Failed: Invalid OTP";
+                    }
                     ErrorTextBlock.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
             {
+                Debug.WriteLine($"Verify Exception: {ex.Message}");
                 ErrorTextBlock.Text = "Error: " + ex.Message;
                 ErrorTextBlock.Visibility = Visibility.Visible;
             }
