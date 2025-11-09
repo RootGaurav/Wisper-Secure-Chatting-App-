@@ -21,6 +21,8 @@ namespace Connectt
     {
         public string? Name { get; set; }
         public string? Id { get; set; }
+        public bool IsOnline { get; set; }
+        public string? LastSeen { get; set; }
     }
     public  class Session2
     {
@@ -41,7 +43,41 @@ namespace Connectt
             FriendRequestControl.FriendRequests = new ObservableCollection<FriendRequestModel>();
 
         }
+        public async Task LoadStatusesAsync()
+        {
+            if (Session.Friends == null || Session.Friends.Count == 0)
+                return;
 
+            try
+            {
+                var friendNames = Session.Friends.Select(f => f.Name).ToList();
+                var payload = new { friends = friendNames };
+
+                string json = JsonConvert.SerializeObject(payload);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync("http://127.0.0.1:5000/get_statuses", content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string responseText = await response.Content.ReadAsStringAsync();
+                    var statuses = JsonConvert.DeserializeObject<Dictionary<string, dynamic>>(responseText);
+
+                    foreach (var f in Session.Friends)
+                    {
+                        if (statuses.ContainsKey(f.Name))
+                        {
+                            f.IsOnline = statuses[f.Name]["online"];
+                            var lastSeen = statuses[f.Name]["last_seen"];
+                            f.LastSeen = lastSeen != null ? lastSeen.ToString() : "";
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Error updating statuses: " + ex.Message);
+            }
+        }
         public async Task LoadIncomingRequests()
         {
 
@@ -105,5 +141,6 @@ namespace Connectt
                 MessageBox.Show("Could not load friends: " + ex.Message);
             }
         }
+
     }
 }

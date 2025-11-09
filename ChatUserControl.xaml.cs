@@ -24,7 +24,38 @@ namespace Connectt
     {
         private string? selectedFriend;
         private DispatcherTimer messageTimer;
+        private DispatcherTimer statusTimer;   // ✅ new timer for online-status checks
+        private readonly Session2 sessionHelper = new Session2(); // ✅ for calling status API
 
+        private HashSet<string> displayedMessages = new HashSet<string>();
+
+        public ChatUserControl()
+        {
+            InitializeComponent();
+            FriendsList.ItemsSource = Session.Friends;
+
+            // ✅ Initialize periodic friend-status checks (every 5 seconds)
+            statusTimer = new DispatcherTimer();
+            statusTimer.Interval = TimeSpan.FromSeconds(5);
+            statusTimer.Tick += StatusTimer_Tick;
+            statusTimer.Start();
+        }
+
+        // ✅ Periodic Online/Offline Refresh
+        private async void StatusTimer_Tick(object sender, EventArgs e)
+        {
+            try
+            {
+                await sessionHelper.LoadStatusesAsync(); // refresh backend friend statuses
+                FriendsList.Items.Refresh(); // reflect color/status text changes
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine("Status refresh error: " + ex.Message);
+            }
+        }
+
+        // 📨 Begin polling messages for selected friend
         private void StartMessagePolling(string friendName)
         {
             if (messageTimer != null)
@@ -43,16 +74,13 @@ namespace Connectt
             messageTimer.Tick += async (sender, e) =>
             {
                 if (capturedFriendName != selectedFriend) return;
-
                 await ReloadMessagesSafely(capturedFriendName);
             };
 
             messageTimer.Start();
         }
 
-
-        private HashSet<string> displayedMessages = new HashSet<string>();
-
+        // 🗨️ Reload messages
         private async Task ReloadMessagesSafely(string friendName)
         {
             displayedMessages.Clear();
@@ -109,12 +137,6 @@ namespace Connectt
                 }
             }
         }
-        public ChatUserControl()
-        {
-            InitializeComponent();
-            FriendsList.ItemsSource = Session.Friends;
-        }
-
 
         public class ChatMessage
         {
@@ -122,18 +144,17 @@ namespace Connectt
             public string message { get; set; }
         }
 
-
+        // 📬 When user selects a friend
         private async void FriendsList_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             if (FriendsList.SelectedItem is FriendModel friend)
             {
                 selectedFriend = friend.Name;
-               MessagesPanel.Children.Clear();
+                MessagesPanel.Children.Clear();
                 await ReloadMessagesSafely(selectedFriend);
                 StartMessagePolling(selectedFriend);
             }
         }
-
 
         public async Task LoadMessagesFromFriend(string friendName)
         {
@@ -190,10 +211,10 @@ namespace Connectt
             }
         }
 
-
+        // 🔐 AES message decryption
         public static string DecryptString(string cipherText)
         {
-            byte[] keyBytes = Encoding.UTF8.GetBytes("CphS2dXaGKwVE13oMqYfLBJTR7ztUn60"); 
+            byte[] keyBytes = Encoding.UTF8.GetBytes("CphS2dXaGKwVE13oMqYfLBJTR7ztUn60");
             byte[] ivBytes = Encoding.UTF8.GetBytes("zXwRQ7TpYVeNcKj1");
 
             byte[] buffer = Convert.FromBase64String(cipherText);
@@ -214,8 +235,7 @@ namespace Connectt
             }
         }
 
-
-
+        // 📤 Send message
         private async void SendButton_Click(object sender, RoutedEventArgs e)
         {
             if (!string.IsNullOrWhiteSpace(MessageTextBox.Text) && !string.IsNullOrWhiteSpace(selectedFriend))
@@ -223,7 +243,6 @@ namespace Connectt
                 string message = MessageTextBox.Text.Trim();
                 string fileName = $"messages_{selectedFriend}.txt";
 
-                
                 var border = new Border
                 {
                     Background = new SolidColorBrush(Color.FromRgb(108, 92, 231)),
@@ -245,10 +264,8 @@ namespace Connectt
                 border.Child = textBlock;
                 MessagesPanel.Children.Add(border);
 
-        
                 string encryptedMessage = CryptoHelper.Encrypt(message);
 
-                
                 var content = new StringContent(JsonConvert.SerializeObject(new
                 {
                     sender = Session.name,
@@ -264,21 +281,15 @@ namespace Connectt
                     MessageBox.Show("Failed to send message to backend");
                 }
 
-               
                 File.AppendAllText(fileName, $"You: {message}{Environment.NewLine}");
-
-                
-               MessageTextBox.Clear();
+                MessageTextBox.Clear();
             }
         }
 
         private void AttachFileButton_Click(object sender, RoutedEventArgs e)
         {
-            // TODO: integrate file‐pick and send logic later.
             MessageBox.Show("Attach file clicked – feature coming soon!",
                             "File Attach", MessageBoxButton.OK, MessageBoxImage.Information);
         }
-
     }
-
 }

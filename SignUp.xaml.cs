@@ -1,19 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Diagnostics;
-using System.Linq;
+using System.IO;
 using System.Net.Http;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
-using System.Windows.Shapes;
 using Newtonsoft.Json;
-using System.IO;
 
 namespace Connectt
 {
@@ -21,145 +15,233 @@ namespace Connectt
     {
         private static readonly HttpClient client = new HttpClient();
 
-        // Keep original endpoints intact
+        // === API endpoints ===
         private readonly string otpapi = "http://127.0.0.1:5000/register";
         private readonly string VerifyAPI = "http://127.0.0.1:5000/verify";
         private readonly string SignInAPI = "http://127.0.0.1:5000/signin";
+        private readonly string ForgotPasswordAPI = "http://127.0.0.1:5000/forgot_password";
+        private readonly string ResetPasswordAPI = "http://127.0.0.1:5000/reset_password";
 
-        // Make fields nullable to satisfy C# nullable rules; actual values are set from UI
         private static string? name = null;
         private static string? gml = null;
-
-        // Kept from original; warning about unused can be ignored or removed if not needed
-        private static int pointt = 0;
 
         public SignUp()
         {
             InitializeComponent();
         }
 
-        // Close (✕) button handler from updated XAML
+        // === Close Window ===
         private void Button_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
         }
 
-        // Called by the "Sign up" button (same as original "GetInfo" hook)
-        private void GetInfo(object sender, RoutedEventArgs e)
+        // === Utility Functions ===
+        private void HideAllForms()
         {
-            // Keep original x:Name controls: Name, gmail
-            name = NameTextBox.Text?.ToString();
-            gml = gmail.Text?.ToString();
+            SignUpForm.Visibility = Visibility.Collapsed;
+            SignInForm.Visibility = Visibility.Collapsed;
+            ForgotPasswordPanel.Visibility = Visibility.Collapsed;
+        }
 
-            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(gml))
-            {
-                ErrorTextBlock.Text = "Please fill in all fields.";
-                ErrorTextBlock.Visibility = Visibility.Visible;
-                return;
-            }
+        private void ClearErrors()
+        {
+            ErrorTextBlock.Visibility = Visibility.Collapsed;
+            SignInErrorContainer.Visibility = Visibility.Collapsed;
+            ForgotErrorContainer.Visibility = Visibility.Collapsed;
+        }
+
+        private void ShowBlockMessage(TextBlock block, string msg, bool isError = true)
+        {
+            if (block == null) return;
+            block.Text = msg;
+            block.Visibility = Visibility.Visible;
+
+            if (isError)
+                block.Foreground = (Brush)FindResource("Warn");
             else
-            {
-                Register(name, gml);
-            }
+                block.Foreground = new SolidColorBrush((Color)ColorConverter.ConvertFromString("#1B5E20"));
         }
 
-        public async void Register(string name, string gml)
-        {
-            var userData = new
-            {
-                name = name,
-                gmail = gml
-            };
-
-            try
-            {
-                var response = await RegisterUserAsync(userData);
-                string responseContent = await response.Content.ReadAsStringAsync();
-                
-                // Debug output
-                Debug.WriteLine($"Response Status: {response.StatusCode}");
-                Debug.WriteLine($"Response Content: {responseContent}");
-
-                if (response.IsSuccessStatusCode)
-                {
-                    ErrorTextBlock.Text = "OTP sent to your Gmail. Please enter it below.";
-                    ErrorTextBlock.Visibility = Visibility.Visible;
-
-                    // Show OTP controls - THIS WAS THE MAIN ISSUE
-                    OtpPanel.Visibility = Visibility.Visible;  // Show the entire StackPanel
-                    VerifyButton.Visibility = Visibility.Visible;
-                    SignUpButton.Visibility = Visibility.Collapsed; // Hide signup button
-                }
-                else
-                {
-                    // Try to parse error message from response
-                    try
-                    {
-                        dynamic errorResponse = JsonConvert.DeserializeObject(responseContent);
-                        ErrorTextBlock.Text = errorResponse?.error?.ToString() ?? "Registration failed";
-                    }
-                    catch
-                    {
-                        ErrorTextBlock.Text = "Name already exists";
-                    }
-                    ErrorTextBlock.Visibility = Visibility.Visible;
-                }
-            }
-            catch (Exception ex)
-            {
-                Debug.WriteLine($"Exception: {ex.Message}");
-                ErrorTextBlock.Text = "Error: " + ex.Message;
-                ErrorTextBlock.Visibility = Visibility.Visible;
-            }
-        }
-
-        // Matches original signature but returns Task<HttpResponseMessage>
-        private async Task<HttpResponseMessage> RegisterUserAsync(object userData)
-        {
-            string json = JsonConvert.SerializeObject(userData);
-            var content = new StringContent(json, Encoding.UTF8, "application/json");
-            
-            // Add timeout and better error handling
-            client.Timeout = TimeSpan.FromSeconds(30);
-            HttpResponseMessage response = await client.PostAsync(otpapi, content);
-            return response;
-        }
-
-        // Called by "Sign Up" tab button
+        // === Navigation ===
         private void ShowSignUp_Click(object sender, RoutedEventArgs e)
         {
+            HideAllForms();
+            ClearErrors();
             SignUpForm.Visibility = Visibility.Visible;
-            SignInForm.Visibility = Visibility.Collapsed;
             TabSignUp.Style = (Style)Resources["PrimaryButton"];
             TabSignIn.Style = (Style)Resources["SecondaryButton"];
         }
 
-        // Called by "Sign In" tab button  
         private void ShowSignIn_Click(object sender, RoutedEventArgs e)
         {
-            SignUpForm.Visibility = Visibility.Collapsed;
+            HideAllForms();
+            ClearErrors();
             SignInForm.Visibility = Visibility.Visible;
-            TabSignUp.Style = (Style)Resources["SecondaryButton"];
             TabSignIn.Style = (Style)Resources["PrimaryButton"];
+            TabSignUp.Style = (Style)Resources["SecondaryButton"];
         }
 
-        private async void SignIn_Click(object sender, RoutedEventArgs e)
+        private void ForgotPassword_Click(object sender, RoutedEventArgs e)
         {
-            string username = SignInUsernameTextBox.Text.Trim();
-            string userOTP = SignInPasswordBox.Password.Trim();
+            HideAllForms();
+            ClearErrors();
+            ForgotPasswordPanel.Visibility = Visibility.Visible;
 
-            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(userOTP))
+            ForgotUsernameBox.Text = "";
+            ForgotGmailBox.Text = "";
+            ResetOtpBox.Password = "";
+            NewPasswordBox.Password = "";
+            ForgotButtonsPanel.Visibility = Visibility.Visible;
+            ResetStep2Panel.Visibility = Visibility.Collapsed;
+        }
+
+        private void BackToSignIn_Click(object sender, RoutedEventArgs e)
+        {
+            HideAllForms();
+            ClearErrors();
+            SignInForm.Visibility = Visibility.Visible;
+            TabSignIn.Style = (Style)Resources["PrimaryButton"];
+            TabSignUp.Style = (Style)Resources["SecondaryButton"];
+        }
+
+        // === SIGN UP ===
+        private void GetInfo(object sender, RoutedEventArgs e)
+        {
+            name = NameTextBox.Text?.Trim();
+            gml = gmail.Text?.Trim();
+
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(gml))
             {
-                SignInError.Text = "Enter both username and OTP";
-                SignInError.Visibility = Visibility.Visible;
+                ShowBlockMessage(ErrorTextBlock, "Please fill in all fields.");
                 return;
             }
 
-            var payload = new
+            Register(name, gml);
+        }
+
+        private async void Register(string name, string gml)
+        {
+            var userData = new { name, gmail = gml };
+
+            try
             {
-                name = username,
-                otp = userOTP
-            };
+                var json = JsonConvert.SerializeObject(userData);
+                var content = new StringContent(json, Encoding.UTF8, "application/json");
+
+                var response = await client.PostAsync(otpapi, content);
+                string responseContent = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ShowBlockMessage(ErrorTextBlock, "OTP sent to your Gmail.", false);
+                    OtpPanel.Visibility = Visibility.Visible;
+                    VerifyButton.Visibility = Visibility.Visible;
+                    SignUpButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    dynamic res = JsonConvert.DeserializeObject(responseContent);
+                    ShowBlockMessage(ErrorTextBlock, res?.error?.ToString() ?? "Registration failed");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowBlockMessage(ErrorTextBlock, "Error: " + ex.Message);
+            }
+        }
+
+        private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
+        {
+            string otp = OTPBox.Password.Trim();
+            if (string.IsNullOrEmpty(otp))
+            {
+                ShowBlockMessage(ErrorTextBlock, "Please enter OTP.");
+                return;
+            }
+
+            var verifyData = new { name, gmail = gml, otp };
+
+            try
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(verifyData), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(VerifyAPI, content);
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ShowBlockMessage(ErrorTextBlock, "Verification successful! Redirecting...", false);
+                    await Task.Delay(1000);
+                    BackToSignIn_Click(null, null); // ✅ Redirect to SignIn
+                }
+                else
+                {
+                    string text = await response.Content.ReadAsStringAsync();
+                    dynamic result = JsonConvert.DeserializeObject(text);
+                    ShowBlockMessage(ErrorTextBlock, result?.error?.ToString() ?? "Invalid OTP");
+                    ResendOtpButton.Visibility = Visibility.Visible;
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowBlockMessage(ErrorTextBlock, "Error verifying: " + ex.Message);
+            }
+        }
+
+        private async void ResendOtp_Click(object sender, RoutedEventArgs e)
+        {
+            if (string.IsNullOrEmpty(name) || string.IsNullOrEmpty(gml))
+            {
+                ShowBlockMessage(ErrorTextBlock, "Please enter username and email first.");
+                return;
+            }
+
+            ShowBlockMessage(ErrorTextBlock, "Resending OTP...", false);
+            ResendOtpButton.IsEnabled = false;
+
+            try
+            {
+                var userData = new { name = name, gmail = gml };
+                var content = new StringContent(JsonConvert.SerializeObject(userData), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(otpapi, content);
+                string responseText = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ShowBlockMessage(ErrorTextBlock, "New OTP sent to your Gmail.", false);
+                    ResendOtpButton.Visibility = Visibility.Collapsed;
+                }
+                else
+                {
+                    dynamic errorResponse = JsonConvert.DeserializeObject(responseText);
+                    ShowBlockMessage(ErrorTextBlock, errorResponse?.error?.ToString() ?? "Failed to resend OTP.");
+                }
+            }
+            catch (Exception ex)
+            {
+                ShowBlockMessage(ErrorTextBlock, "Error resending OTP: " + ex.Message);
+            }
+            finally
+            {
+                ResendOtpButton.IsEnabled = true;
+            }
+        }
+
+        // === SIGN IN ===
+        private async void SignIn_Click(object sender, RoutedEventArgs e)
+        {
+            ClearErrors();
+
+            string username = SignInUsernameTextBox.Text.Trim();
+            string password = SignInPasswordBox.Password.Trim();
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
+            {
+                SignInErrorContainer.Visibility = Visibility.Visible;
+                SignInError.Text = "Please enter both username and password.";
+                return;
+            }
+
+            var payload = new { name = username, otp = password };
 
             try
             {
@@ -169,96 +251,132 @@ namespace Connectt
 
                 if (response.IsSuccessStatusCode)
                 {
+                    SignInErrorContainer.Visibility = Visibility.Visible;
+                    SignInError.Foreground = new SolidColorBrush(Colors.Green);
                     SignInError.Text = "Login successful! Redirecting...";
-                    SignInError.Visibility = Visibility.Visible;
 
-                    // Persist session exactly like VerifyOtp_Click
                     File.WriteAllText("log", username);
                     Session.name = username;
 
-                    await Task.Delay(1000);
 
+                    // 🟢 Notify server: user is online
+                    await SetUserOnlineStatus(username, true);
+
+                    await Task.Delay(1000);
                     new MainWindow().Show();
                     this.Close();
                 }
                 else
                 {
                     dynamic result = JsonConvert.DeserializeObject(body);
-                    SignInError.Text = result?.error ?? "Sign-in failed";
-                    SignInError.Visibility = Visibility.Visible;
+                    SignInErrorContainer.Visibility = Visibility.Visible;
+                    SignInError.Text = result?.error?.ToString() ?? "Invalid credentials";
                 }
             }
             catch (Exception ex)
             {
+                SignInErrorContainer.Visibility = Visibility.Visible;
                 SignInError.Text = "Error: " + ex.Message;
-                SignInError.Visibility = Visibility.Visible;
             }
         }
 
-
-
-        private async void VerifyOtp_Click(object sender, RoutedEventArgs e)
+        //online status update
+        private async Task SetUserOnlineStatus(string username, bool online)
         {
-            // PasswordBox has Password, not Text
-            string otp = OTPBox.Password.Trim();
-
-            if (string.IsNullOrEmpty(otp))
+            try
             {
-                ErrorTextBlock.Text = "Please enter OTP.";
-                ErrorTextBlock.Visibility = Visibility.Visible;
+                var payload = new { name = username, online = online };
+                var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                await client.PostAsync("http://127.0.0.1:5000/set_status", content);
+            }
+            catch { /* ignore minor network errors */ }
+        }
+
+
+        // === FORGOT PASSWORD ===
+        private async void SendResetOtp_Click(object sender, RoutedEventArgs e)
+        {
+            string uname = ForgotUsernameBox.Text.Trim();
+            string email = ForgotGmailBox.Text.Trim();
+
+            if (string.IsNullOrEmpty(uname) || string.IsNullOrEmpty(email))
+            {
+                ShowBlockMessage(ForgotErrorText, "Please fill all fields.");
+                ForgotErrorContainer.Visibility = Visibility.Visible;
                 return;
             }
 
-            var verifyData = new
-            {
-                name = name,
-                otp = otp,
-                gmail = gml
-            };
+            var payload = new { name = uname, gmail = email };
 
             try
             {
-                var content = new StringContent(JsonConvert.SerializeObject(verifyData), Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(VerifyAPI, content);
+                var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(ForgotPasswordAPI, content);
+                string resp = await response.Content.ReadAsStringAsync();
 
                 if (response.IsSuccessStatusCode)
                 {
-                    ErrorTextBlock.Text = "Verification successful! Redirecting...";
-                    ErrorTextBlock.Visibility = Visibility.Visible;
-
-                    // Persist session name (as per original code)
-                    if (!string.IsNullOrWhiteSpace(name))
-                    {
-                        File.WriteAllText("log", name);
-                        Session.name = name; // Set session name
-                    }
-
-                    // Small delay to show success message
-                    await Task.Delay(1000);
-                    
-                    new MainWindow().Show();
-                    this.Close();
+                    ShowBlockMessage(ForgotErrorText, "OTP sent! Please check your email.", false);
+                    ForgotErrorContainer.Visibility = Visibility.Visible;
+                    ForgotButtonsPanel.Visibility = Visibility.Collapsed;
+                    ResetStep2Panel.Visibility = Visibility.Visible;
                 }
                 else
                 {
-                    var resText = await response.Content.ReadAsStringAsync();
-                    try
-                    {
-                        dynamic errorResponse = JsonConvert.DeserializeObject(resText);
-                        ErrorTextBlock.Text = errorResponse?.error?.ToString() ?? "Verification Failed";
-                    }
-                    catch
-                    {
-                        ErrorTextBlock.Text = "Verification Failed: Invalid OTP";
-                    }
-                    ErrorTextBlock.Visibility = Visibility.Visible;
+                    dynamic result = JsonConvert.DeserializeObject(resp);
+                    ShowBlockMessage(ForgotErrorText, result?.error?.ToString() ?? "Failed to send OTP.");
+                    ForgotErrorContainer.Visibility = Visibility.Visible;
                 }
             }
             catch (Exception ex)
             {
-                Debug.WriteLine($"Verify Exception: {ex.Message}");
-                ErrorTextBlock.Text = "Error: " + ex.Message;
-                ErrorTextBlock.Visibility = Visibility.Visible;
+                ForgotErrorContainer.Visibility = Visibility.Visible;
+                ForgotErrorText.Text = "Error: " + ex.Message;
+            }
+        }
+
+        private async void ResetPassword_Click(object sender, RoutedEventArgs e)
+        {
+            string uname = ForgotUsernameBox.Text.Trim();
+            string email = ForgotGmailBox.Text.Trim();
+            string otp = ResetOtpBox.Password.Trim();
+            string newPass = NewPasswordBox.Password.Trim();
+
+            if (string.IsNullOrEmpty(uname) || string.IsNullOrEmpty(email) ||
+                string.IsNullOrEmpty(otp) || string.IsNullOrEmpty(newPass))
+            {
+                ShowBlockMessage(ForgotErrorText, "All fields are required.");
+                ForgotErrorContainer.Visibility = Visibility.Visible;
+                return;
+            }
+
+            var payload = new { name = uname, gmail = email, otp, new_password = newPass };
+
+            try
+            {
+                var content = new StringContent(JsonConvert.SerializeObject(payload), Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(ResetPasswordAPI, content);
+                string resp = await response.Content.ReadAsStringAsync();
+
+                if (response.IsSuccessStatusCode)
+                {
+                    ShowBlockMessage(ForgotErrorText, "Password reset successful! Redirecting to sign in...", false);
+                    ForgotErrorContainer.Visibility = Visibility.Visible;
+
+                    await Task.Delay(1500);
+                    BackToSignIn_Click(null, null);
+                }
+                else
+                {
+                    dynamic result = JsonConvert.DeserializeObject(resp);
+                    ShowBlockMessage(ForgotErrorText, result?.error?.ToString() ?? "Reset failed.");
+                    ForgotErrorContainer.Visibility = Visibility.Visible;
+                }
+            }
+            catch (Exception ex)
+            {
+                ForgotErrorContainer.Visibility = Visibility.Visible;
+                ForgotErrorText.Text = "Error: " + ex.Message;
             }
         }
     }

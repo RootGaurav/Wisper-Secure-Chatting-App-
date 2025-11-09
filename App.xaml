@@ -4,6 +4,8 @@
              xmlns:local="clr-namespace:Connectt"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
+        <local:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
+        <local:LastSeenConverter x:Key="LastSeenConverter"/>
 
         <!-- Color Palette from your image -->
         <SolidColorBrush x:Key="PrimaryDarkTeal" Color="#026670"/>

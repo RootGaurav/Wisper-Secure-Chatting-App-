@@ -5,11 +5,15 @@
              Height="Auto" Width="Auto">
 
     <UserControl.Resources>
-        <!-- Updated Palette -->
+        <!-- Keep your palette -->
         <SolidColorBrush x:Key="Ink" Color="#026670"/>
         <SolidColorBrush x:Key="InkSubtle" Color="#6080807A"/>
         <SolidColorBrush x:Key="GlassFill" Color="#C0FEF9C7"/>
         <SolidColorBrush x:Key="GlassStroke" Color="#60996670"/>
+
+        <!-- 🟢 NEW Brushes for online/offline -->
+        <SolidColorBrush x:Key="OnlineBrush" Color="#2ECC71"/>
+        <SolidColorBrush x:Key="OfflineBrush" Color="#E74C3C"/>
 
         <!-- Sidebar -->
         <Style x:Key="Sidebar" TargetType="Border">
@@ -22,7 +26,7 @@
             </Setter>
         </Style>
 
-        <!-- Friend item container -->
+        <!-- Friend item -->
         <Style x:Key="FriendItem" TargetType="Border">
             <Setter Property="Background" Value="#C0FFFFFF"/>
             <Setter Property="CornerRadius" Value="10"/>
@@ -41,7 +45,7 @@
             </Style.Triggers>
         </Style>
 
-        <!-- Friends ListBox style -->
+        <!-- Friends List -->
         <Style x:Key="FriendsListStyle" TargetType="ListBox">
             <Setter Property="Background" Value="Transparent"/>
             <Setter Property="BorderThickness" Value="0"/>
@@ -49,7 +53,7 @@
             <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
         </Style>
 
-        <!-- Message input TextBox -->
+        <!-- Input TextBox & Buttons stay same -->
         <Style x:Key="InputTextBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="#222"/>
             <Setter Property="Background" Value="#F0FAF7"/>
@@ -71,11 +75,6 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="#3BB86F"/>
-                                <Setter TargetName="Bd" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#8B68E046" BlurRadius="6" ShadowDepth="0"/>
-                                    </Setter.Value>
-                                </Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -83,7 +82,6 @@
             </Setter>
         </Style>
 
-        <!-- Primary send button -->
         <Style x:Key="PrimaryButton" TargetType="Button">
             <Setter Property="Width" Value="110"/>
             <Setter Property="Height" Value="40"/>
@@ -93,51 +91,25 @@
             <Setter Property="Cursor" Value="Hand"/>
             <Setter Property="Background" Value="#3BB86F"/>
             <Setter Property="BorderThickness" Value="0"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" CornerRadius="10" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#6DB86E" BlurRadius="10" ShadowDepth="0"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.8"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
-        <!-- Messages card -->
         <Style x:Key="GlassCard" TargetType="Border">
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Background" Value="#AAFFFFFF"/>
             <Setter Property="BorderBrush" Value="{StaticResource GlassStroke}"/>
             <Setter Property="BorderThickness" Value="1"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="#558BCB75" BlurRadius="12" ShadowDepth="0" Opacity="0.35"/>
-                </Setter.Value>
-            </Setter>
         </Style>
     </UserControl.Resources>
 
+
+    <!-- MAIN GRID -->
     <Grid Background="Transparent">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="260"/>
             <ColumnDefinition Width="*"/>
         </Grid.ColumnDefinitions>
 
-        <!-- Left: Friends -->
+        <!-- LEFT PANEL: Friends List -->
         <Border Grid.Column="0" Style="{StaticResource Sidebar}" Padding="8">
             <StackPanel>
                 <TextBlock Text="Chats"
@@ -145,6 +117,7 @@
                            Foreground="{StaticResource Ink}"
                            FontWeight="SemiBold"
                            Margin="8,8,8,6"/>
+
                 <Border CornerRadius="10"
                         Background="#55FFFFFF"
                         BorderBrush="{StaticResource GlassStroke}"
@@ -153,21 +126,36 @@
                     <ListBox x:Name="FriendsList"
                              Style="{StaticResource FriendsListStyle}"
                              Foreground="{StaticResource Ink}"
+                             ItemsSource="{Binding Friends}"
                              SelectionChanged="FriendsList_SelectionChanged">
+
                         <ListBox.ItemTemplate>
                             <DataTemplate>
                                 <Border Style="{StaticResource FriendItem}">
                                     <DockPanel LastChildFill="True">
+                                        <!-- Status Dot -->
+                                        <Ellipse Width="10" Height="10" Margin="0,0,6,0"
+                                                 VerticalAlignment="Center"
+                                                 Fill="{Binding IsOnline, Converter={StaticResource BoolToBrushConverter}}"/>
+
+                                        <!-- Friend Image -->
                                         <Border Width="36" Height="36" CornerRadius="18" Background="#33FFFFFF" Margin="0,0,8,0">
                                             <Image Source="{Binding Image, FallbackValue=/User_Avatar.png}"
                                                    Stretch="UniformToFill"
                                                    RenderOptions.BitmapScalingMode="HighQuality"
                                                    ClipToBounds="True"/>
                                         </Border>
-                                        <TextBlock Text="{Binding Name}"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{StaticResource Ink}"
-                                                   VerticalAlignment="Center"/>
+
+                                        <!-- Friend Name + Last Seen -->
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Name}"
+                                                       FontWeight="SemiBold"
+                                                       Foreground="{StaticResource Ink}"
+                                                       FontSize="14"/>
+                                            <TextBlock Text="{Binding Converter={StaticResource LastSeenConverter}, Path=.}"
+                                                       FontSize="11"
+                                                       Foreground="#666"/>
+                                        </StackPanel>
                                     </DockPanel>
                                 </Border>
                             </DataTemplate>
@@ -177,54 +165,49 @@
             </StackPanel>
         </Border>
 
-        <!-- Right: Chat -->
+
+        <!-- RIGHT PANEL: Chat Window -->
         <Grid Grid.Column="1" Margin="10,0,0,0">
             <Grid.RowDefinitions>
                 <RowDefinition Height="*"/>
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <!-- Messages area -->
+            <!-- Messages -->
             <Border Grid.Row="0" Style="{StaticResource GlassCard}">
                 <ScrollViewer x:Name="ChatScrollViewer" VerticalScrollBarVisibility="Auto" Padding="10">
                     <StackPanel x:Name="MessagesPanel"/>
                 </ScrollViewer>
             </Border>
-            
 
-            <!-- Composer -->
-
-
-
-            <!-- Composer -->
+            <!-- Message Input -->
             <Border Grid.Row="1" Style="{StaticResource GlassCard}" Margin="0,10,0,0" Padding="6">
                 <DockPanel LastChildFill="False">
                     <TextBox x:Name="MessageTextBox"
-                 Width="Auto"
-                 MinWidth="200"
-                 Style="{StaticResource InputTextBox}"
-                 Margin="4,2,6,2"
-                 DockPanel.Dock="Left"/>
+                             Width="Auto"
+                             MinWidth="200"
+                             Style="{StaticResource InputTextBox}"
+                             Margin="4,2,6,2"
+                             DockPanel.Dock="Left"/>
 
-                    <!-- New file button -->
                     <Button x:Name="AttachFileButton"
-                Content="📄"
-                Width="40"
-                Height="40"
-                FontSize="20"
-                FontWeight="Bold"
-                Margin="0,2,4,2"
-                Style="{StaticResource PrimaryButton}"
-                DockPanel.Dock="Left"
-                Click="AttachFileButton_Click"/>
+                            Content="📄"
+                            Width="40"
+                            Height="40"
+                            FontSize="20"
+                            FontWeight="Bold"
+                            Margin="0,2,4,2"
+                            Style="{StaticResource PrimaryButton}"
+                            DockPanel.Dock="Left"
+                            Click="AttachFileButton_Click"/>
 
                     <Button Content="Send"
-                Style="{StaticResource PrimaryButton}"
-                Margin="0,2,4,2"
-                Click="SendButton_Click"/>
+                            Style="{StaticResource PrimaryButton}"
+                            Margin="0,2,4,2"
+                            Click="SendButton_Click"/>
                 </DockPanel>
             </Border>
-
         </Grid>
     </Grid>
 </UserControl>
+ 

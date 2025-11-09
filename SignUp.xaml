@@ -118,31 +118,6 @@
             <Setter Property="Background" Value="{StaticResource NeonGradient}"/>
             <Setter Property="BorderThickness" Value="0"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" CornerRadius="10" Background="{TemplateBinding Background}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.9"/>
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#60026670" BlurRadius="15" ShadowDepth="2"/>
-                                    </Setter.Value>
-                                </Setter>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.8"/>
-                            </Trigger>
-                            <Trigger Property="IsEnabled" Value="False">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.6"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
 
         <Style x:Key="SecondaryButton" TargetType="Button">
@@ -155,147 +130,134 @@
             <Setter Property="BorderBrush" Value="#80026670"/>
             <Setter Property="BorderThickness" Value="1"/>
             <Setter Property="Cursor" Value="Hand"/>
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="Button">
-                        <Border x:Name="bd" 
-                                CornerRadius="10" 
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}">
-                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsMouseOver" Value="True">
-                                <Setter TargetName="bd" Property="Background" Value="#80FCE181"/>
-                            </Trigger>
-                            <Trigger Property="IsPressed" Value="True">
-                                <Setter TargetName="bd" Property="Opacity" Value="0.7"/>
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
         </Style>
     </Window.Resources>
 
-    <!-- Main layout Grid for responsiveness -->
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <!-- Row for the top tab buttons -->
             <RowDefinition Height="*"/>
-            <!-- Row for the main form content, which will expand to fill available space -->
         </Grid.RowDefinitions>
 
-        <!-- Close Button: Spans both rows to stay in the top-right corner -->
         <Button Grid.Row="0" Grid.RowSpan="2"
                 Content="✕"
                 Width="36" Height="36"
-                HorizontalAlignment="Right" VerticalAlignment="Top"
+                HorizontalAlignment="Right"
+                VerticalAlignment="Top"
                 Margin="10"
                 Background="Transparent"
                 BorderThickness="0"
                 Foreground="{StaticResource Ink}"
                 Click="Button_Click"
                 Panel.ZIndex="1"/>
-        <!-- ZIndex ensures the close button stays on top of other content -->
 
-        <!-- Toggle Tabs -->
-        <StackPanel Grid.Row="0"
-                    Orientation="Horizontal"
-                    HorizontalAlignment="Center"
-                    Margin="0,60,0,20">
-            <!-- Removed rigid vertical margins for better adaptability -->
-            <Button x:Name="TabSignUp"
-                    Content="Sign Up"
-                    Width="100" Height="36"
-                    Margin="4"
-                    Style="{StaticResource PrimaryButton}"
-                    Click="ShowSignUp_Click"/>
-            <Button x:Name="TabSignIn"
-                    Content="Sign In"
-                    Width="100" Height="36"
-                    Margin="4"
-                    Style="{StaticResource SecondaryButton}"
-                    Click="ShowSignIn_Click"/>
+        <StackPanel Grid.Row="0" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,60,0,20">
+            <Button x:Name="TabSignUp" Content="Sign Up" Width="100" Height="36" Margin="4"
+                    Style="{StaticResource PrimaryButton}" Click="ShowSignUp_Click"/>
+            <Button x:Name="TabSignIn" Content="Sign In" Width="100" Height="36" Margin="4"
+                    Style="{StaticResource SecondaryButton}" Click="ShowSignIn_Click"/>
         </StackPanel>
 
-        <!-- Forms Container: A Viewbox scales its content to fit the available space -->
         <Viewbox Grid.Row="1" Margin="20" Stretch="Uniform">
-            <!-- The Grid inside the Viewbox holds the forms and provides a base size for scaling -->
             <Grid Width="420">
-                <!-- Sign Up Form -->
-                <Border x:Name="SignUpForm"
-                        Style="{StaticResource GlassCard}"
-                        MinHeight="400">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="20"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
+                <!-- SIGNUP -->
+                <Border x:Name="SignUpForm" Style="{StaticResource GlassCard}" MinHeight="400">
+                    <StackPanel>
+                        <TextBlock Text="Create your secure account" Style="{StaticResource Headline}" />
+                        <TextBlock Text="Welcome to Wisper — privacy-first messaging." Style="{StaticResource Subhead}" />
 
-                        <TextBlock Grid.Row="0" Text="Create your secure account" Style="{StaticResource Headline}"/>
-                        <TextBlock Grid.Row="1" Text="Welcome to Wisper — privacy-first messaging." Style="{StaticResource Subhead}"/>
+                        <TextBlock Text="Username" Foreground="{StaticResource InkSubtle}" Margin="0,4,0,6"/>
+                        <TextBox x:Name="NameTextBox" Style="{StaticResource RoundedTextBox}"/>
 
-                        <TextBlock Grid.Row="2" Text="Username" Foreground="{StaticResource InkSubtle}" Margin="0,4,0,6"/>
-                        <TextBox Grid.Row="3" x:Name="NameTextBox" Style="{StaticResource RoundedTextBox}"/>
+                        <TextBlock Text="Email address" Foreground="{StaticResource InkSubtle}" Margin="0,12,0,6"/>
+                        <TextBox x:Name="gmail" Style="{StaticResource RoundedTextBox}"/>
 
-                        <TextBlock Grid.Row="4" Text="Email address" Foreground="{StaticResource InkSubtle}" Margin="0,12,0,6"/>
-                        <TextBox Grid.Row="5" x:Name="gmail" Style="{StaticResource RoundedTextBox}"/>
-
-                        <StackPanel Grid.Row="7" x:Name="OtpPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="0,12,0,0">
-                            <TextBlock x:Name="OTPLabel" Text="Enter OTP" Foreground="{StaticResource Ink}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <StackPanel x:Name="OtpPanel" Orientation="Horizontal" Visibility="Collapsed" Margin="0,12,0,0">
+                            <TextBlock Text="Enter OTP" Foreground="{StaticResource Ink}" Margin="0,0,8,0" VerticalAlignment="Center"/>
                             <PasswordBox x:Name="OTPBox" Style="{StaticResource RoundedPasswordBox}" Width="170"/>
                         </StackPanel>
 
-                        <TextBlock Grid.Row="8" x:Name="ErrorTextBlock" Foreground="{StaticResource Warn}" FontSize="13" FontWeight="SemiBold" Visibility="Collapsed" Margin="0,10,0,0"/>
+                        <TextBlock x:Name="ErrorTextBlock" Foreground="{StaticResource Warn}" FontSize="15"
+                                   FontWeight="SemiBold" TextWrapping="Wrap" Visibility="Collapsed"
+                                   Margin="0,10,0,0" Padding="8" Background="#FFFFF8F8"
+                                   HorizontalAlignment="Stretch" TextAlignment="Center"/>
 
-                        <StackPanel Grid.Row="9" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
                             <Button x:Name="SignUpButton" Content="Sign up" Style="{StaticResource PrimaryButton}" Click="GetInfo"/>
-                            <Button x:Name="VerifyButton" Content="Verify OTP" Style="{StaticResource PrimaryButton}" Click="VerifyOtp_Click" Visibility="Collapsed" Margin="12,0,0,0"/>
+                            <Button x:Name="VerifyButton" Content="Verify OTP" Style="{StaticResource PrimaryButton}"
+                                    Click="VerifyOtp_Click" Visibility="Collapsed" Margin="12,0,0,0"/>
+                            <Button x:Name="ResendOtpButton" Content="Resend OTP" Style="{StaticResource SecondaryButton}"
+                                    Click="ResendOtp_Click" Visibility="Collapsed" Margin="12,0,0,0"/>
                         </StackPanel>
-                    </Grid>
+                    </StackPanel>
                 </Border>
 
-                <!-- Sign In Form -->
-                <Border x:Name="SignInForm"
-                        Style="{StaticResource GlassCard}"
-                        MinHeight="300"
-                        Visibility="Collapsed">
-                    <Grid>
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <RowDefinition Height="Auto"/>
-                            <!-- Extra row for button -->
-                        </Grid.RowDefinitions>
+                <!-- SIGNIN -->
+                <Border x:Name="SignInForm" Style="{StaticResource GlassCard}" Visibility="Collapsed" MinHeight="340">
+                    <StackPanel>
+                        <TextBlock Text="Sign In to Wisper" Style="{StaticResource Headline}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Enter your credentials below" Style="{StaticResource Subhead}" HorizontalAlignment="Center"/>
 
-                        <TextBlock Grid.Row="0" Text="Sign In to Wisper" Style="{StaticResource Headline}" HorizontalAlignment="Center"/>
-                        <TextBlock Grid.Row="1" Text="Enter your credentials below" Style="{StaticResource Subhead}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Username" Foreground="{StaticResource InkSubtle}" Margin="0,6,0,4"/>
+                        <TextBox x:Name="SignInUsernameTextBox" Style="{StaticResource RoundedTextBox}"/>
 
-                        <TextBlock Grid.Row="2" Text="Username or Email" Foreground="{StaticResource InkSubtle}" Margin="0,6,0,4"/>
-                        <TextBox Grid.Row="3" x:Name="SignInUsernameTextBox" Style="{StaticResource RoundedTextBox}"/>
+                        <TextBlock Text="Password" Foreground="{StaticResource InkSubtle}" Margin="0,12,0,4"/>
+                        <PasswordBox x:Name="SignInPasswordBox" Style="{StaticResource RoundedPasswordBox}"/>
 
-                        <TextBlock Grid.Row="4" Text="Password" Foreground="{StaticResource InkSubtle}" Margin="0,12,0,4"/>
-                        <PasswordBox Grid.Row="5" x:Name="SignInPasswordBox" Style="{StaticResource RoundedPasswordBox}"/>
+                        <Border Margin="0,10,0,0" Background="#FFFFF8F8" CornerRadius="8" Padding="6"
+                                Visibility="Collapsed" x:Name="SignInErrorContainer">
+                            <TextBlock x:Name="SignInError" Foreground="{StaticResource Warn}"
+                                       FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
+                        </Border>
 
-                        <TextBlock Grid.Row="6" x:Name="SignInError" Foreground="{StaticResource Warn}" FontSize="13" Visibility="Collapsed" HorizontalAlignment="Center" Margin="0,10,0,0"/>
+                        <Button Content="Sign In" Style="{StaticResource PrimaryButton}"
+                                HorizontalAlignment="Center" Click="SignIn_Click" Margin="0,20,0,0"/>
 
-                        <Button Grid.Row="7" Content="Sign In" Style="{StaticResource PrimaryButton}" HorizontalAlignment="Center" Click="SignIn_Click" Margin="0,16,0,0"/>
-                    </Grid>
+                        <StackPanel HorizontalAlignment="Center" Margin="0,18,0,0">
+                            <TextBlock Text="Forgot Password?" Foreground="{StaticResource Ink}" FontWeight="SemiBold"
+                                       FontSize="13" HorizontalAlignment="Center"/>
+                            <Button x:Name="ForgotPasswordButton" Content="Reset via OTP" Style="{StaticResource SecondaryButton}"
+                                    Width="160" Height="36" Click="ForgotPassword_Click"/>
+                        </StackPanel>
+                    </StackPanel>
+                </Border>
+
+                <!-- FORGOT PASSWORD -->
+                <Border x:Name="ForgotPasswordPanel" Style="{StaticResource GlassCard}" Visibility="Collapsed" MinHeight="400">
+                    <StackPanel>
+                        <TextBlock Text="Reset Your Password" Style="{StaticResource Headline}" HorizontalAlignment="Center"/>
+                        <TextBlock Text="Enter your username and registered email" Style="{StaticResource Subhead}" HorizontalAlignment="Center"/>
+
+                        <TextBlock Text="Username" Foreground="{StaticResource InkSubtle}" Margin="0,6,0,4"/>
+                        <TextBox x:Name="ForgotUsernameBox" Style="{StaticResource RoundedTextBox}"/>
+
+                        <TextBlock Text="Registered Email" Foreground="{StaticResource InkSubtle}" Margin="0,6,0,4"/>
+                        <TextBox x:Name="ForgotGmailBox" Style="{StaticResource RoundedTextBox}"/>
+
+                        <Border Margin="0,10,0,0" Background="#FFFFF8F8" CornerRadius="8" Padding="6"
+                                Visibility="Collapsed" x:Name="ForgotErrorContainer">
+                            <TextBlock x:Name="ForgotErrorText" Foreground="{StaticResource Warn}"
+                                       FontSize="14" FontWeight="SemiBold" TextWrapping="Wrap"
+                                       TextAlignment="Center"/>
+                        </Border>
+
+                        <StackPanel x:Name="ForgotButtonsPanel" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,16,0,0">
+                            <Button x:Name="SendOtpButton" Content="Send OTP" Style="{StaticResource PrimaryButton}" Click="SendResetOtp_Click"/>
+                            <Button x:Name="BackButton" Content="Back" Style="{StaticResource SecondaryButton}" Margin="12,0,0,0" Click="BackToSignIn_Click"/>
+                        </StackPanel>
+
+                        <StackPanel x:Name="ResetStep2Panel" Visibility="Collapsed" Margin="0,18,0,0" HorizontalAlignment="Center">
+                            <TextBlock Text="Enter OTP and new password" Foreground="{StaticResource InkSubtle}" HorizontalAlignment="Center" Margin="0,0,0,6"/>
+                            <TextBlock Text="OTP" Foreground="{StaticResource InkSubtle}" Margin="0,6,0,4"/>
+                            <PasswordBox x:Name="ResetOtpBox" Style="{StaticResource RoundedPasswordBox}" Width="240"/>
+                            <TextBlock Text="New Password" Foreground="{StaticResource InkSubtle}" Margin="0,6,0,4"/>
+                            <PasswordBox x:Name="NewPasswordBox" Style="{StaticResource RoundedPasswordBox}" Width="240"/>
+                            <Button Content="Reset Password" Style="{StaticResource PrimaryButton}" Click="ResetPassword_Click"
+                                    Width="180" Height="40" Margin="0,10,0,0"/>
+                            <Button x:Name="BackButton2" Content="Back" Style="{StaticResource SecondaryButton}" Margin="12,0,0,0" Click="BackToSignIn_Click"/>
+                        </StackPanel>
+                    </StackPanel>
                 </Border>
             </Grid>
         </Viewbox>
