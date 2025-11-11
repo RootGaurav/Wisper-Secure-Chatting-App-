@@ -18,25 +18,36 @@ namespace Connectt
             public string? Id { get; set; }
         }
 
-        Session2 s2;
         private static readonly HttpClient client = new HttpClient();
-        private static readonly string APIDenUrl = "http://127.0.0.1:5000/respond_request";
-        private static readonly string ApiSed_Req = "http://127.0.0.1:5000/send_friend_request";
-        private static readonly string APIAcceptUrl = "http://127.0.0.1:5000/respond_request";
 
-        // Initialize the collection so it’s never null
-        public static ObservableCollection<FriendRequestModel>? FriendRequests { get; set; }
-            = new ObservableCollection<FriendRequestModel>();
+        // ✅ API Endpoints
+        private static readonly string ApiSendRequest = "http://127.0.0.1:5000/send_friend_request";
+        private static readonly string ApiRespondRequest = "http://127.0.0.1:5000/respond_request";
+        private static readonly string ApiGetRequests = "http://127.0.0.1:5000/get_requests";
+        private static readonly string ApiGetSuggestions = "http://127.0.0.1:5000/get_suggestions";
+
+        // ✅ Collections
+        public static ObservableCollection<FriendRequestModel> FriendRequests { get; set; } = new();
+        public static ObservableCollection<string> FriendSuggestions { get; set; } = new();
 
         public FriendRequestControl()
         {
             InitializeComponent();
 
-            // Bind and load on startup
             RequestsListView.ItemsSource = FriendRequests;
-            _ = LoadIncomingRequests();
+            SuggestionsListView.ItemsSource = FriendSuggestions;
+
+            _ = LoadAllData();
         }
 
+        // === LOAD BOTH REQUESTS AND SUGGESTIONS ===
+        private async Task LoadAllData()
+        {
+            await LoadIncomingRequests();
+            await LoadFriendSuggestions();
+        }
+
+        // === SEND FRIEND REQUEST ===
         private async void SendRequestButton_Click(object sender, RoutedEventArgs e)
         {
             string senderName = Session.name;
@@ -44,7 +55,13 @@ namespace Connectt
 
             if (string.IsNullOrEmpty(receiverName))
             {
-                MessageBox.Show("Please enter a name.");
+                MessageBox.Show("Please enter a username.", "Input Required", MessageBoxButton.OK, MessageBoxImage.Warning);
+                return;
+            }
+
+            if (receiverName.Equals(senderName, StringComparison.OrdinalIgnoreCase))
+            {
+                MessageBox.Show("You cannot send a friend request to yourself.", "Invalid", MessageBoxButton.OK, MessageBoxImage.Exclamation);
                 return;
             }
 
@@ -53,76 +70,175 @@ namespace Connectt
                 var data = new { sender = senderName, receiver = receiverName };
                 var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-                var result = await client.PostAsync(ApiSed_Req, content);
+                var result = await client.PostAsync(ApiSendRequest, content);
+                string resp = await result.Content.ReadAsStringAsync();
 
                 if (result.IsSuccessStatusCode)
                 {
-                    MessageBox.Show("Friend request sent.");
-                    await LoadIncomingRequests();
+                    MessageBox.Show("✅ Friend request sent!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                    await LoadAllData();
                 }
                 else
                 {
-                    MessageBox.Show("Failed to send request.");
+                    dynamic error = JsonConvert.DeserializeObject(resp);
+                    MessageBox.Show($"❌ {error?.error ?? "Failed to send request"}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Error: " + ex.Message);
+                MessageBox.Show($"Error sending request: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
+        // === LOAD INCOMING REQUESTS ===
         private async Task LoadIncomingRequests()
         {
-            string user = Session.name;
-
             try
             {
-                var response = await client.GetAsync($"http://127.0.0.1:5000/get_requests?name={user}");
+                string user = Session.name;
+                var response = await client.GetAsync($"{ApiGetRequests}?name={user}");
+
                 if (response.IsSuccessStatusCode)
                 {
                     string json = await response.Content.ReadAsStringAsync();
                     var requests = JsonConvert.DeserializeObject<string[]>(json);
 
+                    FriendRequests.Clear();
                     if (requests != null)
                     {
-                        FriendRequests?.Clear();
-                        foreach (var name in requests)
+                        foreach (var req in requests)
                         {
-                            FriendRequests?.Add(new FriendRequestModel { Name = name, Id = name });
+                            FriendRequests.Add(new FriendRequestModel { Name = req, Id = req });
                         }
                     }
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show("Could not load requests: " + ex.Message);
+                MessageBox.Show("Failed to load requests: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 
-        private async void AcceptButton_Click(object sender, RoutedEventArgs e)
+        // === LOAD FRIEND SUGGESTIONS ===
+        private async Task LoadFriendSuggestions()
         {
-            string senderName = (string)((Button)sender).Tag;
-            string receiverName = Session.name;
+            try
+            {
+                string user = Session.name;
+                var response = await client.GetAsync($"{ApiGetSuggestions}?name={user}");
 
-            var data = new { sender = senderName, receiver = receiverName, status = 1 };
-            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-            await client.PostAsync(APIAcceptUrl, content);
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    var suggestions = JsonConvert.DeserializeObject<string[]>(json);
 
-            MessageBox.Show("Request accepted.");
-            await LoadIncomingRequests();
+                    FriendSuggestions.Clear();
+                    if (suggestions != null)
+                    {
+                        foreach (var s in suggestions)
+                            FriendSuggestions.Add(s);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Failed to load suggestions: " + ex.Message, "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+            }
         }
 
+        // === ACCEPT REQUEST ===
+        private async void AcceptButton_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string senderName)
+            {
+                try
+                {
+                    var receiverName = Session.name;
+                    var data = new { sender = senderName, receiver = receiverName, status = 1 };
+                    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                    var result = await client.PostAsync(ApiRespondRequest, content);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"✅ You are now friends with {senderName}!", "Friend Added", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await LoadIncomingRequests();
+                        await LoadFriendSuggestions();
+                        Session2 s2 = new Session2();
+                        await s2.LoadFriends();
+
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to accept request.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error accepting request: " + ex.Message);
+                }
+            }
+        }
+
+        // === DENY REQUEST ===
         private async void DenyButton_Click(object sender, RoutedEventArgs e)
         {
-            string senderName = (string)((Button)sender).Tag;
-            string receiverName = Session.name;
+            if (sender is Button btn && btn.Tag is string senderName)
+            {
+                try
+                {
+                    var receiverName = Session.name;
+                    var data = new { sender = senderName, receiver = receiverName, status = 0 };
+                    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
 
-            var data = new { sender = senderName, receiver = receiverName };
-            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
-            await client.PostAsync(APIDenUrl, content);
+                    var result = await client.PostAsync(ApiRespondRequest, content);
+                    if (result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"❌ Request from {senderName} denied.", "Denied", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await LoadIncomingRequests();
+                        await LoadFriendSuggestions(); 
+                    }
+                    else
+                    {
+                        MessageBox.Show("Failed to deny request.", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show("Error denying request: " + ex.Message);
+                }
+            }
+        }
 
-            MessageBox.Show("Request denied.");
-            await LoadIncomingRequests();
+        // === ADD FRIEND FROM SUGGESTIONS ===
+        private async void AddSuggestion_Click(object sender, RoutedEventArgs e)
+        {
+            if (sender is Button btn && btn.Tag is string suggestedUser)
+            {
+                try
+                {
+                    string senderName = Session.name;
+                    var data = new { sender = senderName, receiver = suggestedUser };
+                    var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+
+                    var result = await client.PostAsync(ApiSendRequest, content);
+                    string resp = await result.Content.ReadAsStringAsync();
+
+                    if (result.IsSuccessStatusCode)
+                    {
+                        MessageBox.Show($"✅ Friend request sent to {suggestedUser}!", "Success", MessageBoxButton.OK, MessageBoxImage.Information);
+                        await LoadFriendSuggestions();
+                    }
+                    else
+                    {
+                        dynamic err = JsonConvert.DeserializeObject(resp);
+                        MessageBox.Show($"❌ {err?.error ?? "Failed to send request."}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    MessageBox.Show($"Error sending suggestion request: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+            }
         }
     }
 }

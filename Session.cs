@@ -23,6 +23,9 @@ namespace Connectt
         public string? Id { get; set; }
         public bool IsOnline { get; set; }
         public string? LastSeen { get; set; }
+
+        public string Image { get; set; } = "/Connectt;component/Assets/Friends.png";
+
     }
     public  class Session2
     {
@@ -43,6 +46,27 @@ namespace Connectt
             FriendRequestControl.FriendRequests = new ObservableCollection<FriendRequestModel>();
 
         }
+
+        public async Task<List<string>> GetFriendSuggestions()
+        {
+            try
+            {
+                var response = await client.GetAsync($"http://127.0.0.1:5000/suggest_friends?name={Session.name}");
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    var suggestions = JsonConvert.DeserializeObject<List<string>>(json);
+                    return suggestions ?? new List<string>();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Could not load suggestions: " + ex.Message);
+            }
+            return new List<string>();
+        }
+
+
         public async Task LoadStatusesAsync()
         {
             if (Session.Friends == null || Session.Friends.Count == 0)

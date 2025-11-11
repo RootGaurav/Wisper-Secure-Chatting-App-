@@ -379,5 +379,10 @@ namespace Connectt
                 ForgotErrorText.Text = "Error: " + ex.Message;
             }
         }
+
+        private void gmail_TextChanged(object sender, TextChangedEventArgs e)
+        {
+
+        }
     }
 }

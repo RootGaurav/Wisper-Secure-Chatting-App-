@@ -140,10 +140,11 @@
 
                                         <!-- Friend Image -->
                                         <Border Width="36" Height="36" CornerRadius="18" Background="#33FFFFFF" Margin="0,0,8,0">
-                                            <Image Source="{Binding Image, FallbackValue=/User_Avatar.png}"
-                                                   Stretch="UniformToFill"
-                                                   RenderOptions.BitmapScalingMode="HighQuality"
-                                                   ClipToBounds="True"/>
+                                            <Image Source="{Binding Image, FallbackValue={StaticResource UserAvatarIcon}}"
+       Stretch="UniformToFill"
+       RenderOptions.BitmapScalingMode="HighQuality"
+       ClipToBounds="True"/>
+
                                         </Border>
 
                                         <!-- Friend Name + Last Seen -->

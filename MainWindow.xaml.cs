@@ -41,6 +41,8 @@ namespace Connectt
 
             LoadUserName();
             Load();
+            // ✅ Set default content: Friend Requests page
+            MainContent.Content = new FriendRequestControl();
 
             // 🟢 Mark user online
             _ = SetUserOnlineStatus(Session.name, true);

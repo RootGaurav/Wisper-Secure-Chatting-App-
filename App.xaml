@@ -6,6 +6,8 @@
     <Application.Resources>
         <local:BoolToBrushConverter x:Key="BoolToBrushConverter"/>
         <local:LastSeenConverter x:Key="LastSeenConverter"/>
+        <BitmapImage x:Key="UserAvatarIcon" UriSource="/Connectt;component/Assets/Friends.png" />
+
 
         <!-- Color Palette from your image -->
         <SolidColorBrush x:Key="PrimaryDarkTeal" Color="#026670"/>

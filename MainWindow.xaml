@@ -22,6 +22,7 @@
         <!-- REFACTOR 2: Define Images as Resources for better management -->
         <BitmapImage x:Key="FriendRequestIcon" UriSource="/Friend_Request.png" />
         <BitmapImage x:Key="ChatIcon" UriSource="/Chat_1.png" />
+        <BitmapImage x:Key="UserAvatarIcon" UriSource="Friends.png" />
 
         <!-- Effects -->
         <DropShadowEffect x:Key="GeneralDropShadow" Color="#60996670" BlurRadius="16" ShadowDepth="0" Opacity="0.35"/>

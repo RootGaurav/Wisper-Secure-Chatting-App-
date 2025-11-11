@@ -1,11 +1,12 @@
 ﻿<UserControl x:Class="Connectt.FriendRequestControl"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" 
-             xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
-             mc:Ignorable="d" 
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
              d:DesignHeight="450" d:DesignWidth="800">
 
+    <!-- ========== RESOURCES ========== -->
     <UserControl.Resources>
         <SolidColorBrush x:Key="Ink" Color="#026670"/>
         <SolidColorBrush x:Key="GlassFill" Color="#C0FEF9C7"/>
@@ -13,9 +14,9 @@
         <SolidColorBrush x:Key="Warn" Color="#E74C3C"/>
         <SolidColorBrush x:Key="SuccessGreen" Color="#43A047"/>
         <SolidColorBrush x:Key="Accent" Color="#43A047"/>
-
         <SolidColorBrush x:Key="DangerRed" Color="#E53935"/>
 
+        <!-- Glass Header Style -->
         <Style x:Key="HeaderCard" TargetType="Border">
             <Setter Property="CornerRadius" Value="12"/>
             <Setter Property="Background" Value="{StaticResource GlassFill}"/>
@@ -29,6 +30,7 @@
             </Setter>
         </Style>
 
+        <!-- Rounded TextBox with Placeholder -->
         <Style x:Key="RoundedTextBox" TargetType="TextBox">
             <Setter Property="Foreground" Value="{StaticResource Ink}"/>
             <Setter Property="Background" Value="#60FFFFFF"/>
@@ -40,21 +42,27 @@
             <Setter Property="Template">
                 <Setter.Value>
                     <ControlTemplate TargetType="TextBox">
-                        <Border x:Name="Bd"
-                                Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="10">
-                            <ScrollViewer x:Name="PART_ContentHost"/>
-                        </Border>
+                        <Grid>
+                            <Border x:Name="Bd"
+                                    Background="{TemplateBinding Background}"
+                                    BorderBrush="{TemplateBinding BorderBrush}"
+                                    BorderThickness="{TemplateBinding BorderThickness}"
+                                    CornerRadius="10"/>
+                            <ScrollViewer x:Name="PART_ContentHost" Margin="8,0,0,0"/>
+                            <TextBlock x:Name="Placeholder"
+                                       Text="Enter username..."
+                                       Foreground="#808080"
+                                       Margin="12,0,0,0"
+                                       VerticalAlignment="Center"
+                                       IsHitTestVisible="False"
+                                       Visibility="Collapsed"/>
+                        </Grid>
                         <ControlTemplate.Triggers>
+                            <Trigger Property="Text" Value="">
+                                <Setter TargetName="Placeholder" Property="Visibility" Value="Visible"/>
+                            </Trigger>
                             <Trigger Property="IsKeyboardFocused" Value="True">
                                 <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SuccessGreen}"/>
-                                <Setter TargetName="Bd" Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#8B68E046" BlurRadius="12" ShadowDepth="0"/>
-                                    </Setter.Value>
-                                </Setter>
                             </Trigger>
                         </ControlTemplate.Triggers>
                     </ControlTemplate>
@@ -62,6 +70,7 @@
             </Setter>
         </Style>
 
+        <!-- Buttons -->
         <Style x:Key="PrimaryButton" TargetType="Button">
             <Setter Property="Width" Value="120"/>
             <Setter Property="Height" Value="36"/>
@@ -80,11 +89,6 @@
                         <ControlTemplate.Triggers>
                             <Trigger Property="IsMouseOver" Value="True">
                                 <Setter TargetName="bd" Property="Opacity" Value="0.92"/>
-                                <Setter Property="Effect">
-                                    <Setter.Value>
-                                        <DropShadowEffect Color="#6DB86E" BlurRadius="10" ShadowDepth="0"/>
-                                    </Setter.Value>
-                                </Setter>
                             </Trigger>
                             <Trigger Property="IsPressed" Value="True">
                                 <Setter TargetName="bd" Property="Opacity" Value="0.85"/>
@@ -115,45 +119,30 @@
             <Style.Triggers>
                 <Trigger Property="IsMouseOver" Value="True">
                     <Setter Property="Background" Value="#16FFFFFF"/>
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <DropShadowEffect Color="#338BCB75" BlurRadius="10" ShadowDepth="0"/>
-                        </Setter.Value>
-                    </Setter>
                 </Trigger>
                 <Trigger Property="IsSelected" Value="True">
                     <Setter Property="Background" Value="#22FFFFFF"/>
                 </Trigger>
             </Style.Triggers>
         </Style>
-
-        <Style x:Key="AvatarWrap" TargetType="Border">
-            <Setter Property="Width" Value="40"/>
-            <Setter Property="Height" Value="40"/>
-            <Setter Property="CornerRadius" Value="20"/>
-            <Setter Property="Background" Value="#33FFFFFF"/>
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect Color="#558BCB75" BlurRadius="8" ShadowDepth="0" Opacity="0.35"/>
-                </Setter.Value>
-            </Setter>
-        </Style>
     </UserControl.Resources>
 
-    <Grid Background="Transparent">
+    <!-- ========== MAIN LAYOUT ========== -->
+    <Grid Background="Transparent" Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <!-- Search -->
             <RowDefinition Height="*"/>
+            <!-- Horizontal Split -->
         </Grid.RowDefinitions>
 
-        <!-- Search and Send Request -->
-        <Border Grid.Row="0" Style="{StaticResource HeaderCard}" Margin="10,10,10,0">
+        <!-- 🔍 Search -->
+        <Border Grid.Row="0" Style="{StaticResource HeaderCard}" Margin="0,0,0,10">
             <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
                 <TextBox x:Name="SearchTextBox"
                          Width="300"
                          Style="{StaticResource RoundedTextBox}"
-                         FontSize="14"
-                         ToolTip="Type a username to search"/>
+                         FontSize="14"/>
                 <Button x:Name="SendRequestButton"
                         Content="Send Request"
                         Margin="15,0,0,0"
@@ -162,79 +151,130 @@
             </StackPanel>
         </Border>
 
-        <!-- Friend Requests list -->
-        <Border Grid.Row="1"
-                CornerRadius="12"
-                Background="#C0FEF9C7"
-                BorderBrush="{StaticResource GlassStroke}"
-                BorderThickness="1"
-                Margin="10">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
+        <!-- 🤝 Pending + Suggestions side-by-side -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="12"/>
+                <!-- spacing -->
+                <ColumnDefinition Width="*" />
+            </Grid.ColumnDefinitions>
 
-                <Border Grid.Row="0"
-                        CornerRadius="12,12,0,0"
-                        Background="{StaticResource Accent}">
-                    <TextBlock Text="Friend Requests"
-                               Foreground="White"
-                               FontSize="16"
-                               FontWeight="Bold"
-                               Margin="15,10"/>
-                </Border>
+            <!-- 🕒 Pending Requests -->
+            <Border Grid.Column="0"
+                    CornerRadius="12"
+                    Background="#C0FEF9C7"
+                    BorderBrush="{StaticResource GlassStroke}"
+                    BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
 
-                <ListView x:Name="RequestsListView"
-                          Grid.Row="1"
-                          BorderThickness="0"
-                          ScrollViewer.HorizontalScrollBarVisibility="Disabled"
-                          ItemContainerStyle="{StaticResource RequestRow}">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <Border Padding="12,10" BorderBrush="#33FFFFFF" BorderThickness="0,0,0,1">
-                                <Grid VerticalAlignment="Center">
-                                    <Grid.ColumnDefinitions>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="10"/>
-                                        <ColumnDefinition Width="*"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                        <ColumnDefinition Width="16"/>
-                                        <ColumnDefinition Width="Auto"/>
-                                    </Grid.ColumnDefinitions>
+                    <Border Grid.Row="0" CornerRadius="12,12,0,0" Background="{StaticResource Accent}">
+                        <TextBlock Text="Pending Friend Requests"
+                                   Foreground="White"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Margin="15,10"/>
+                    </Border>
 
-                                    <!-- Avatar -->
-                                    <Border Grid.Column="0" Style="{StaticResource AvatarWrap}">
-                                        <Image Source="{Binding Image, FallbackValue=/User_Avatar.png}"
-                                               Stretch="UniformToFill"
-                                               RenderOptions.BitmapScalingMode="HighQuality"
-                                               ClipToBounds="True"/>
-                                    </Border>
+                    <ListView x:Name="RequestsListView"
+                              Grid.Row="1"
+                              BorderThickness="0"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ItemContainerStyle="{StaticResource RequestRow}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" BorderBrush="#33FFFFFF" BorderThickness="0,0,0,1">
+                                    <Grid VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
 
-                                    <!-- Name -->
-                                    <TextBlock Grid.Column="2"
-                                               Text="{Binding Name}"
-                                               VerticalAlignment="Center"
-                                               FontSize="14"
-                                               Foreground="{StaticResource Ink}"/>
+                                        <TextBlock Grid.Column="0"
+                                                   Text="{Binding Name}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="14"
+                                                   Foreground="{StaticResource Ink}"/>
 
-                                    <!-- Accept/Deny Buttons -->
-                                    <Button Grid.Column="3"
-                                            Content="Accept"
-                                            Style="{StaticResource SuccessButton}"
-                                            Tag="{Binding Id}"
-                                            Click="AcceptButton_Click"/>
-                                    <Button Grid.Column="5"
-                                            Content="Deny"
-                                            Style="{StaticResource DangerButton}"
-                                            Tag="{Binding Id}"
-                                            Click="DenyButton_Click"/>
-                                </Grid>
-                            </Border>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-        </Border>
+                                        <Button Grid.Column="1"
+                                                Content="Accept"
+                                                Style="{StaticResource SuccessButton}"
+                                                Tag="{Binding Id}"
+                                                Margin="10,0"
+                                                Click="AcceptButton_Click"/>
+
+                                        <Button Grid.Column="2"
+                                                Content="Deny"
+                                                Style="{StaticResource DangerButton}"
+                                                Tag="{Binding Id}"
+                                                Click="DenyButton_Click"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+
+            <!-- 🌟 Friend Suggestions -->
+            <Border Grid.Column="2"
+                    CornerRadius="12"
+                    Background="#C0FEF9C7"
+                    BorderBrush="{StaticResource GlassStroke}"
+                    BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+
+                    <Border Grid.Row="0" CornerRadius="12,12,0,0" Background="{StaticResource Accent}">
+                        <TextBlock Text="Friend Suggestions"
+                                   Foreground="White"
+                                   FontSize="16"
+                                   FontWeight="Bold"
+                                   Margin="15,10"/>
+                    </Border>
+
+                    <ListView x:Name="SuggestionsListView"
+                              Grid.Row="1"
+                              BorderThickness="0"
+                              ScrollViewer.HorizontalScrollBarVisibility="Disabled"
+                              ItemContainerStyle="{StaticResource RequestRow}">
+                        <ListView.ItemTemplate>
+                            <DataTemplate>
+                                <Border Padding="12,10" BorderBrush="#33FFFFFF" BorderThickness="0,0,0,1">
+                                    <Grid VerticalAlignment="Center">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+
+                                        <TextBlock Grid.Column="0"
+                                                   Padding="10"
+                                                   Text="{Binding}"
+                                                   VerticalAlignment="Center"
+                                                   FontSize="14"
+                                                   FontFamily="Arial Black"
+                                                   Foreground="{StaticResource Ink}"/>
+
+                                        <Button Grid.Column="1"
+                                                Content="Add Friend"
+                                                Style="{StaticResource SuccessButton}"
+                                                Tag="{Binding}"
+                                                Click="AddSuggestion_Click"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ListView.ItemTemplate>
+                    </ListView>
+                </Grid>
+            </Border>
+        </Grid>
     </Grid>
 </UserControl>
